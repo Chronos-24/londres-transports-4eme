@@ -227,6 +227,9 @@ td input{ min-width:90px; }
 .chip.sel,.chip[aria-pressed="true"]{ background:var(--ink); color:var(--paper); border-color:var(--ink); outline:3px solid var(--mt); }
 .chip.ghost{ position:fixed; z-index:50; pointer-events:none; transform:translate(-50%,-60%); box-shadow:0 6px 16px rgba(0,0,0,.25); }
 .tstat{ font-weight:700; margin:10px 0 0; min-height:1.5em; }
+.dl{ background:var(--paper); border:2px solid var(--ink); border-radius:14px; padding:18px 20px; margin:0 0 30px; }
+.dl h3{ font-size:1.25rem; margin-bottom:6px; }
+.dl ul{ margin:6px 0 12px; }
 .snav{ display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap; margin-top:14px; }
 .dots{ display:flex; gap:4px; }
 .sdot{ width:36px; height:36px; border:0; background:none; padding:0; cursor:pointer; display:grid; place-items:center; }
@@ -327,6 +330,7 @@ const MISSIONS = [
      links:[{label:"Itinéraire Google Maps",url:g("Gatwick Airport","British Museum, London","transit")},L.tfl],
      hint:"Le prix est en livres sterling (£) : utilisez le taux fourni et arrondissez.", fixed:[{label:"1 £ ≈ 1,15 € : multipliez les prix en livres par 1,15", info:true, src:"taux de change arrondi"}]}
   ],
+  corrSteps:["La Grand-Combe → aéroport de Montpellier : environ 2 h 30 en transports en commun (TER jusqu’à Nîmes puis Montpellier, puis navette), pour environ 20 €. En voiture : environ 1 h 15.", "Vol direct Montpellier → Londres-Gatwick : environ 1 h 55, de 50 à 150 € selon la date, plus 1 h 30 d’attente à l’aéroport. Il n’y a pas de vol direct vers Heathrow.", "Gatwick → British Museum : train (Thameslink ou Gatwick Express) puis métro, environ 1 h à 1 h 15, pour environ 20 €.", "Total : environ 6 h 30 à 7 h 30, pour 110 à 200 € l’aller simple."],
   questions:[
     {st:"L’aller-retour coûte environ … € car …", q:"Estimez le prix d’un aller-retour pour une personne (même trajet).", hint:"Doublez votre prix total.", c:"Un aller simple coûte environ 110 à 200 € : ~20 € pour rejoindre l’aéroport, 50 à 150 € pour le vol, ~20 € de train et métro à Londres. L’aller-retour revient donc à environ 220 à 400 €. C’est surtout le prix du vol qui varie, selon la date et le moment où l’on réserve."},
     {st:"Londres est facile d’accès pour les touristes car elle possède …", q:"Montrez que Londres est facilement accessible aux touristes du monde entier.", c:"Londres possède 5 aéroports internationaux (Heathrow, Gatwick, Stansted, Luton, City) qui reçoivent des vols du monde entier. Même depuis une petite ville du Gard, on y arrive en moins de 8 h grâce à un vol direct de 2 h. Des trains rapides et le métro relient les aéroports au centre. Londres est une métropole mondiale, un hub qui accueille d’importants flux de touristes.", words:["5 aéroports","aéroport international","hub","métropole mondiale","flux de touristes"]}
@@ -352,6 +356,7 @@ const MISSIONS = [
      links:[{label:"Itinéraire Google Maps",url:g("St Pancras International, London","Canary Wharf, London","transit")},L.tfl],
      hint:"Plusieurs lignes sont possibles (Jubilee, Elizabeth line, DLR). Choisissez la plus rapide."}
   ],
+  corrSteps:["La Grand-Combe → Paris Gare de Lyon : TER jusqu’à Nîmes (environ 50 min), puis TGV jusqu’à Paris (environ 3 h).", "Gare de Lyon → Gare du Nord : RER D, environ 15 min, 2,50 €.", "Eurostar Paris Gare du Nord → Londres St Pancras : environ 2 h 20, plus 1 h de contrôles avant le départ.", "St Pancras → Canary Wharf : métro (Jubilee, Elizabeth line ou DLR), environ 30 min, environ 3 €.", "Total : environ 8 h 30 à 9 h 30, de 150 à 350 € selon la date."],
   questions:[
     {st:"Nous avons fait … changements : à …", q:"Combien de changements avez-vous faits au total ?", c:"4 changements : à Nîmes (TER → TGV), à Paris Gare de Lyon (TGV → RER D), à Paris Gare du Nord (RER → Eurostar) et à Londres St Pancras (Eurostar → métro). Il peut y en avoir un de plus dans le métro londonien."},
     {st:"L’Eurostar est un train … qui passe sous … Il relie Londres à …", q:"Qu’est-ce que l’Eurostar ? Expliquez pourquoi c’est un symbole de l’intégration de Londres dans l’Europe.", c:"L’Eurostar est un train à grande vitesse qui relie Londres à Paris, Bruxelles et Amsterdam en passant par le tunnel sous la Manche, ouvert en 1994. Il place Paris à un peu plus de 2 h de Londres, de centre-ville à centre-ville. Même après le Brexit (2020), il circule tous les jours : Londres reste branchée sur le réseau européen de grande vitesse.", words:["tunnel sous la Manche","1994","Paris, Bruxelles, Amsterdam","grande vitesse","Brexit"]}
@@ -374,6 +379,7 @@ const MISSIONS = [
      links:[{label:"Itinéraire Google Maps",url:g("Victoria Coach Station, London","Senate House, University of London","transit")},L.tfl],
      hint:"Cherchez la ligne de métro Victoria (couleur bleu clair).", fixed:[{label:"1 £ ≈ 1,15 € : multipliez les prix en livres par 1,15", info:true, src:"taux de change arrondi"}]}
   ],
+  corrSteps:["TER La Grand-Combe → Nîmes : environ 50 min, environ 12 €.", "FlixBus Nîmes → Londres Victoria Coach Station : de 20 à 24 h, souvent avec 1 ou 2 changements, de 80 à 130 €.", "Victoria Coach Station → Bloomsbury : métro (ligne Victoria), environ 20 min, environ 3 €.", "Total : environ 22 à 26 h, pour 100 à 150 € l’aller simple."],
   questions:[
     {st:"Le bus peut traverser la Manche soit …, soit …", q:"Comment le bus traverse-t-il la Manche ? Donnez les deux solutions possibles.", c:"Soit par la navette Eurotunnel (Le Shuttle) : le bus monte dans un train qui passe dans le tunnel sous la Manche, entre Calais (Coquelles) et Folkestone, en 35 min environ. Soit par le ferry entre Calais et Douvres, en 1 h 30 environ.", words:["tunnel sous la Manche","navette Eurotunnel","ferry","Calais","Douvres"]},
     {st:"Le bus est plus avantageux car … mais il est moins avantageux car …", q:"Comparez votre trajet avec celui des cadres (train) ou des touristes (avion) : qu’est-ce qui est plus avantageux, qu’est-ce qui l’est moins ?", compare:true, hint:"Utilisez le tableau « Pour comparer » juste en dessous : comparez d’abord les durées, puis les prix. Vous pouvez aussi demander leurs résultats aux groupes voisins.", c:"Le bus est le trajet le moins cher (environ 100 à 150 € au total), mais le plus long : plus de 20 h, avec des changements. Le train est plus cher (150 à 350 €) mais deux fois plus rapide (environ 9 h). L’avion est souvent le plus rapide (environ 7 h). Chacun choisit selon son budget et son temps : Londres est accessible à tous les budgets."}
@@ -396,6 +402,7 @@ const MISSIONS = [
      links:[{label:"Itinéraire Google Maps",url:g("Port of Dover","Covent Garden, London","driving")}],
      hint:"Attention : au Royaume-Uni, on roule à gauche ! Pour le prix, multipliez la distance par 2.", fixed:[{label:"Même tarif : environ 2 € par km", info:true, src:"ordre de grandeur des transporteurs"}]}
   ],
+  corrSteps:["La Grand-Combe → Calais : environ 1 000 km. Google Maps indique environ 10 h en voiture ; en camion, il faut environ 15 h de conduite, soit 1,5 à 2 jours avec les pauses obligatoires. Prix : environ 2 000 € (1 000 km × 2 €).", "Ferry Calais → Douvres : environ 1 h 30, environ 400 € pour le camion et son chauffeur.", "Douvres → Covent Garden : environ 120 km, 2 h de route, environ 240 €.", "Total : environ 1,5 à 2 jours, pour 2 500 à 3 000 € le voyage (pour tout le camion)."],
   questions:[
     {st:"Le camion emprunte surtout les autoroutes …", q:"Quelles sont les autoroutes les plus empruntées par votre camion ?", c:"Selon l’itinéraire proposé : la N106 puis l’A9 jusqu’à la vallée du Rhône, l’A7 (autoroute du Soleil) jusqu’à Lyon, puis l’A6 ou l’A31 vers le nord, l’A26 (« autoroute des Anglais ») et l’A16 jusqu’à Calais. Au Royaume-Uni : la M20 puis l’A20 jusqu’à Londres.", words:["A7","A6","A26","A16","M20"]},
     {st:"Le ferry est une solution car le Royaume-Uni est … et …", q:"Expliquez pourquoi le ferry est une solution possible pour le transport routier vers le Royaume-Uni.", c:"Le Royaume-Uni est une île : il faut traverser la Manche. Le pas de Calais est le passage le plus court (environ 33 km). Les ferries partent très souvent et embarquent directement les camions : à l’arrivée, le camion reprend la route sans que la marchandise soit déchargée.", words:["île","Manche","trajet court","nombreux départs","camions embarqués"]}
@@ -693,14 +700,18 @@ function renderMission(M){
   <div class="actions">
     <button class="btn" id="copy">Copier notre fiche</button>
     <button class="btn alt" id="toBilan">Voir la mise en commun</button>
-  </div>`;
+  </div>
+  <section class="dl" aria-labelledby="dlT"><h3 id="dlT">${ic("📥")} Correction complète</h3><div id="dlMsg" aria-live="polite"></div>
+    <button class="btn" id="dlBtn">Télécharger la correction</button></section>`;
   const view = document.getElementById("view"); view.innerHTML = h;
+  updDl(M);
+  document.getElementById("dlBtn").onclick=()=>downloadCorrection(M);
 
   document.getElementById("chg").onclick=()=>{ S.pickM=M.id; go("home"); };
   view.querySelectorAll("input[data-s]").forEach(inp=>inp.oninput=()=>{
     const i=inp.dataset.s; st.steps[i]=st.steps[i]||{}; st.steps[i][inp.dataset.k]=inp.value; save(); refresh(M);
   });
-  view.querySelectorAll("textarea[data-q]").forEach(t=>t.addEventListener("input",()=>{ st.q[t.dataset.q]=t.value; save(); updCorr(view,t); }));
+  view.querySelectorAll("textarea[data-q]").forEach(t=>t.addEventListener("input",()=>{ st.q[t.dataset.q]=t.value; save(); updCorr(view,t); updDl(M); }));
   view.querySelectorAll(".word").forEach(b=>b.onclick=()=>{
     const t=document.getElementById("q"+b.dataset.q); t.value=(t.value+(t.value&&!/\s$/.test(t.value)?" ":"")+b.dataset.w).trimStart(); t.dispatchEvent(new Event("input")); t.focus();
   });
@@ -730,6 +741,7 @@ function refresh(M){
   document.getElementById("tp").textContent=T.p? eur(T.p):"—";
   document.getElementById("route").innerHTML=routeHTML(M);
   document.getElementById("prog").textContent=progressText(M,T);
+  updDl(M);
 }
 
 function copyFiche(M){
@@ -858,6 +870,78 @@ function setupDnD(view, sl){
   draw(false);
 }
 
+
+/* ---------- correction téléchargeable ---------- */
+function completion(M){
+  const st=ms(M.id), miss=[];
+  M.steps.forEach((s,i)=>{ const V=sview(s), v=st.steps[i]||{}; if(!V.given && !((+v.h||0)*60+(+v.m||0))) miss.push(`la durée de l’étape ${i+1} (${M.stops[i]} → ${M.stops[i+1]})`); });
+  M.questions.forEach((q,i)=>{ if((st.q[i]||"").trim().length<MINC) miss.push(`votre réponse à la question ${i+1}`); });
+  return miss;
+}
+function updDl(M){
+  const box=document.getElementById("dlMsg"), b=document.getElementById("dlBtn"); if(!box) return;
+  const miss = teacher ? [] : completion(M);
+  b.disabled = miss.length>0;
+  box.innerHTML = miss.length
+    ? `<p>La correction se débloque quand votre travail est terminé. Il vous reste à compléter :</p><ul>${miss.map(x=>`<li>${esc(x)}</li>`).join("")}</ul>`
+    : `<p>Bravo, votre travail est terminé ! Téléchargez la correction : elle contient votre travail à côté de la correction, puis la correction de toutes les missions. Vous pourrez l’ouvrir, l’imprimer ou l’enregistrer en PDF.</p>`;
+}
+const traceFull = sl => esc(sl.text).replace(/\[([^\]]+)\]/g,"<strong>$1</strong>");
+const SYNTH = "Londres est reliée au reste du monde par tous les modes de transport. Pour les personnes : cinq aéroports internationaux, l’Eurostar qui passe sous la Manche et des lignes d’autocars. Pour les marchandises : des camions qui traversent la Manche en ferry ou par le tunnel, et des porte-conteneurs qui partent du port de London Gateway. Ces flux de personnes et de marchandises font de Londres une métropole mondiale et une interface entre le Royaume-Uni, l’Europe et le monde. Plus le trajet est rapide, plus il est cher : chacun choisit selon son budget et son temps.";
+function buildCorrection(W){
+  const date=new Date().toLocaleDateString("fr-FR",{day:"numeric",month:"long",year:"numeric"});
+  let b = `<header><h1>Londres, connectée au monde</h1><p class="sub">Géographie 4e · Correction${W?` · ${esc(W.tab)} · ${LV().name} (${LV().tag})`:" complète"} · ${date}</p>
+  <button class="noprint" onclick="window.print()">Imprimer ou enregistrer en PDF</button></header>`;
+  if(W){
+    const st=ms(W.id), T=totals(W);
+    b += `<section><h2>Votre travail comparé à la correction</h2><h3>${esc(W.title)}</h3>
+    <table><caption>Le trajet</caption><thead><tr><th scope="col">Étape</th><th scope="col">Votre réponse</th><th scope="col">Correction</th></tr></thead><tbody>`;
+    W.steps.forEach((s,i)=>{ const v=st.steps[i]||{}, V=sview(s), d=(+v.h||0)*60+(+v.m||0);
+      const mine = V.given ? `Donnée fournie : ${V.fixed.filter(f=>!f.info).map(f=>esc(f.label)+" ("+[f.m?fmt(f.m):"",f.p?eur(f.p):""].filter(Boolean).join(", ")+")").join(" ; ")}`
+        : `${fmt(d)}${v.p?" · "+esc(v.p)+" €":""}${v.n?" · "+esc(v.n):""}`;
+      b += `<tr><th scope="row">${i+1}. ${esc(W.stops[i])} → ${esc(W.stops[i+1])}</th><td>${mine}</td><td>${esc(W.corrSteps[i])}</td></tr>`; });
+    b += `<tr><th scope="row">Total</th><td>${fmt(T.t)} · ${T.p?eur(T.p):"—"}</td><td>${esc(W.corrSteps[W.corrSteps.length-1])}</td></tr></tbody></table>`;
+    W.questions.forEach((q,i)=>{ b += `<div class="qa"><h4>${esc(q.q)}</h4><p><b>Votre réponse :</b> ${esc(st.q[i]||"(pas de réponse)")}</p><p class="c"><b>Correction :</b> ${esc(q.c)}</p></div>`; });
+    if(st.q.b && W.bonusC) b += `<div class="qa"><h4>Défi : ${esc(W.bonus)}</h4><p><b>Votre réponse :</b> ${esc(st.q.b)}</p><p class="c"><b>Correction :</b> ${esc(W.bonusC)}</p></div>`;
+    b += `</section>`;
+  }
+  b += `<section><h2>Correction de toutes les missions</h2>`;
+  MISSIONS.forEach(M=>{
+    b += `<article><h3>${esc(M.tab.replace(" (en classe)",""))} : ${esc(M.title)}</h3>`;
+    if(M.guided){
+      b += `<h4>Le trajet du conteneur</h4><dl>${M.slides.filter(x=>!x.trace).map(x=>`<dt>${esc(x.q)}</dt><dd>${esc(x.a)}</dd>`).join("")}</dl>`;
+      const tr=M.slides.find(x=>x.trace); if(tr) b += `<h4>Trace écrite</h4><p class="trace">${traceFull(tr)}</p>`;
+    } else {
+      b += `<h4>Le trajet</h4><ul>${M.corrSteps.map(x=>`<li>${esc(x)}</li>`).join("")}</ul>
+      <h4>Les questions</h4><dl>${M.questions.map(q=>`<dt>${esc(q.q)}</dt><dd>${esc(q.c)}</dd>`).join("")}${M.bonusC?`<dt>Défi : ${esc(M.bonus)}</dt><dd>${esc(M.bonusC)}</dd>`:""}</dl>`;
+    }
+    b += `</article>`;
+  });
+  b += `</section><section><h2>Conclusion : Londres, une métropole connectée au monde</h2><p class="trace">${SYNTH}</p>
+  <p class="note">Les durées et les prix sont des ordres de grandeur : ils changent selon la date et le moment de la réservation.</p></section>`;
+  return `<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Correction – Londres, connectée au monde</title>
+<style>
+body{font-family:"Atkinson Hyperlegible",Verdana,Arial,sans-serif;font-size:17px;line-height:1.6;color:#111;background:#fff;max-width:900px;margin:0 auto;padding:24px}
+h1{font-size:1.8rem;margin:0}h2{font-size:1.4rem;border-bottom:3px solid #111;padding-bottom:4px;margin-top:32px}h3{font-size:1.2rem;margin:22px 0 6px}h4{font-size:1rem;margin:14px 0 4px}
+.sub{color:#444;margin:4px 0 12px}table{border-collapse:collapse;width:100%;margin:8px 0 14px}caption{text-align:left;font-weight:700;padding-bottom:4px}
+th,td{border:1px solid #888;padding:8px;text-align:left;vertical-align:top}thead th{background:#eee}
+.qa{border-left:5px solid #888;padding:4px 12px;margin:12px 0}.c{border-left:5px solid #1E7A45;padding-left:10px}
+dt{font-weight:700;margin-top:10px}dd{margin:4px 0 0 0;padding-left:14px;border-left:4px solid #1E7A45}
+.trace{background:#f3f6f9;border:1px solid #bbb;padding:12px 16px;border-radius:8px}.note{color:#444;font-size:.9rem}
+article{break-inside:avoid-page}button{font:inherit;font-weight:700;padding:10px 16px;border:2px solid #111;border-radius:8px;background:#111;color:#fff;cursor:pointer}
+@media print{.noprint{display:none}body{padding:0}}
+</style></head><body><main>${b}</main></body></html>`;
+}
+function downloadCorrection(W){
+  const html=buildCorrection(W), blob=new Blob([html],{type:"text/html"}), url=URL.createObjectURL(blob);
+  const a=document.createElement("a"); a.href=url; a.download=`correction-londres${W?"-"+W.id:""}.html`;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(()=>URL.revokeObjectURL(url),60000);
+  toast("Correction téléchargée : ouvrez le fichier pour la lire, l’imprimer ou l’enregistrer en PDF.");
+}
+window.buildCorrection = buildCorrection;
+
 /* ---------- mise en commun ---------- */
 function renderBilan(){
   setColor(null);
@@ -882,11 +966,16 @@ function renderBilan(){
     <div class="words" role="group" aria-label="Mots utiles à ajouter">${["aéroports internationaux","tunnel sous la Manche","Eurostar","ports","conteneurs","flux de personnes","flux de marchandises","métropole mondiale","interface"].map(w=>`<button type="button" class="word" data-w="${w}" aria-label="Ajouter « ${w} »">+ ${w}</button>`).join("")}</div></div>
   </section>`;
   if(teacher) h+=`<div class="teacher"><h3>Repères enseignant</h3><ul><li>Avion ~7 h · Train ~9 h · Bus ~22 h · Camion 1,5 à 2 jours · Navire 5 à 7 jours.</li><li>Prix : ~2 800 € pour un camion de pélardons, ~2 000 € pour un conteneur de 10 000 pièces, soit quelques centimes par objet transporté.</li><li>Idée à faire émerger : plus le trajet est rapide, plus il est cher ; Londres est reliée par tous les modes de transport, pour les personnes comme pour les marchandises.</li></ul></div>`;
-  h+=`<div class="actions" style="margin-top:14px"><button class="btn alt" id="clrB">Remettre le tableau à zéro</button></div>`;
+  h+=`<div class="actions" style="margin-top:14px"><button class="btn" id="dlAll">${ic("📥")} Télécharger la correction complète</button><button class="btn alt" id="clrB">Remettre le tableau à zéro</button></div>`;
   const view=document.getElementById("view"); view.innerHTML=h;
   view.querySelectorAll("input[data-b]").forEach(inp=>inp.oninput=()=>{ const id=inp.dataset.b; S.bilan[id]=S.bilan[id]||{}; S.bilan[id][inp.dataset.k]=inp.value; save(); drawBars(); });
   const c=document.getElementById("concl"); c.oninput=()=>{ S.concl=c.value; save(); };
   view.querySelectorAll(".word").forEach(b=>b.onclick=()=>{ c.value=(c.value+(c.value&&!/\s$/.test(c.value)?", ":"")+b.dataset.w).trimStart(); S.concl=c.value; save(); c.focus(); });
+  document.getElementById("dlAll").onclick=()=>{
+    const M=MISSIONS.find(m=>m.id===S.pickM && !m.guided);
+    if(teacher || (M && !completion(M).length)) downloadCorrection(M && !teacher ? M : null);
+    else toast("La correction se débloque quand votre mission est terminée (ou avec le code enseignant).");
+  };
   document.getElementById("clrB").onclick=()=>{ S.bilan={}; save(); renderBilan(); toast("Tableau remis à zéro."); };
   drawBars();
 }
