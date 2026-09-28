@@ -1,0 +1,923 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Londres, connectée au monde – Géographie 4e</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Overpass:wght@700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#EEF2F6; --paper:#FFFFFF; --ink:#152033; --muted:#4F5B6E; --line:#B8C3D0; --soft:#F3F6F9;
+  --ok:#1E7A45; --ko:#B3261E;
+  --m:#C2185B; --ml:#F48FB1; --mt:var(--m);
+  --fs:17px;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){ --bg:#0F1724; --paper:#182234; --ink:#EDF1F6; --muted:#B4BFCD; --line:#3A4A63; --soft:#1F2B41; --mt:var(--ml); --ok:#7FD6A0; --ko:#FF9C94; }
+}
+:root[data-theme="dark"]{ --bg:#0F1724; --paper:#182234; --ink:#EDF1F6; --muted:#B4BFCD; --line:#3A4A63; --soft:#1F2B41; --mt:var(--ml); --ok:#7FD6A0; --ko:#FF9C94; }
+/* contraste élevé */
+:root.hc{ --bg:#FFFFFF; --paper:#FFFFFF; --ink:#000000; --muted:#000000; --line:#000000; --soft:#FFFFFF; --mt:var(--m); --ok:#0B5A2C; --ko:#8C1D18; }
+:root.hc body{ background:#fff; color:#000; }
+:root.hc a{ text-decoration:underline; }
+:root.hc .step,:root.hc .qs,:root.hc .mission-head,:root.hc .slide,:root.hc .card,:root.hc .given,:root.hc .bars,:root.hc .tablewrap{ border-width:2px; border-color:#000; }
+:root.hc input,:root.hc textarea{ border-color:#000; }
+
+html{ font-size:var(--fs); scroll-padding-top:env(safe-area-inset-top,0px); }
+*,*::before,*::after{ box-sizing:inherit; }
+body{ margin:0; background:var(--bg); color:var(--ink); font-family:"Atkinson Hyperlegible",Verdana,Arial,sans-serif; font-size:1rem; line-height:1.55; }
+/* espacement renforcé (dyslexie, lecture facilitée) */
+:root.sp body{ letter-spacing:.06em; word-spacing:.18em; line-height:1.95; }
+:root.sp p,:root.sp .task,:root.sp label{ text-align:left; }
+:root.sp .tracetxt{ line-height:2.5; }
+h1,h2,h3,.disp{ font-family:"Overpass","Arial Narrow",Arial,sans-serif; line-height:1.2; margin:0; }
+a{ color:inherit; }
+button,input,textarea,select{ font:inherit; color:inherit; letter-spacing:inherit; }
+:focus-visible{ outline:3px solid var(--mt); outline-offset:3px; border-radius:4px; }
+.sr{ position:absolute!important; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0; }
+.skip{ position:absolute; left:12px; top:-60px; background:var(--ink); color:var(--paper); padding:10px 16px; border-radius:8px; z-index:100; font-weight:700; }
+.skip:focus{ top:calc(8px + env(safe-area-inset-top,0px)); }
+.wrap{ max-width:1000px; margin:0 auto; padding:0 18px; }
+
+/* en-tête */
+header.top{ background:var(--paper); border-bottom:1px solid var(--line); }
+.top .wrap{ display:flex; align-items:center; gap:12px; padding-top:12px; padding-bottom:12px; flex-wrap:wrap; }
+.top h1{ font-size:1.45rem; font-weight:900; flex:1 1 260px; }
+.top h1 small{ display:block; font-family:"Atkinson Hyperlegible",sans-serif; font-weight:400; font-size:.88rem; color:var(--muted); margin-top:2px; }
+.ibtn{ min-height:44px; min-width:44px; border:2px solid var(--line); background:var(--paper); border-radius:999px; padding:6px 14px; cursor:pointer; font-size:.95rem; font-weight:700; }
+.ibtn:hover{ border-color:var(--ink); }
+.ibtn[aria-expanded="true"]{ background:var(--ink); color:var(--paper); border-color:var(--ink); }
+.ibtn.danger{ border-color:var(--ko); color:var(--ko); }
+.timer{ display:flex; align-items:center; gap:6px; background:var(--soft); border:2px solid var(--line); border-radius:999px; padding:3px 4px 3px 14px; }
+.timer .t{ font-family:"Overpass",sans-serif; font-weight:800; font-size:1.2rem; min-width:4.2ch; font-variant-numeric:tabular-nums; }
+.timer.done .t{ color:var(--ko); }
+.timer .ibtn{ min-height:38px; padding:4px 12px; }
+
+/* panneau d'accessibilité */
+#a11y{ background:var(--paper); border-bottom:1px solid var(--line); }
+#a11y .wrap{ padding-top:16px; padding-bottom:18px; }
+#a11y h2{ font-size:1.2rem; margin-bottom:10px; }
+.a11y-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:10px 24px; }
+.a11y-grid fieldset{ border:0; padding:0; margin:0; }
+.a11y-grid legend{ font-weight:700; margin-bottom:4px; }
+.opt{ display:flex; align-items:center; gap:10px; min-height:44px; cursor:pointer; }
+.opt input{ width:22px; height:22px; accent-color:var(--ink); flex:0 0 auto; }
+.opt small{ display:block; color:var(--muted); }
+.seg-choice{ display:flex; flex-wrap:wrap; gap:6px; }
+.seg-choice label{ display:flex; align-items:center; gap:6px; border:2px solid var(--line); border-radius:10px; padding:6px 12px; min-height:44px; cursor:pointer; }
+.seg-choice input{ width:20px; height:20px; accent-color:var(--ink); }
+
+/* navigation entre missions */
+nav.picker{ display:flex; gap:8px; overflow-x:auto; padding:16px 2px 6px; }
+.tab{ flex:0 0 auto; display:flex; align-items:center; gap:8px; min-height:44px; border:2px solid var(--line); background:var(--paper); border-radius:12px; padding:8px 14px; cursor:pointer; font-weight:700; }
+.tab .dot{ width:12px; height:12px; border-radius:50%; background:var(--c); }
+.tab[aria-current="page"]{ border-color:var(--ink); box-shadow:inset 0 -5px 0 var(--c); }
+
+/* accueil */
+.home{ margin-top:14px; }
+.card{ background:var(--paper); border:1px solid var(--line); border-radius:18px; padding:22px 24px; margin-bottom:16px; }
+.card h2{ font-size:1.9rem; font-weight:900; }
+.card > p{ max-width:68ch; }
+.choice{ border:0; padding:0; margin:18px 0 0; }
+.choice legend{ font-family:"Overpass",sans-serif; font-weight:800; font-size:1.25rem; margin-bottom:10px; }
+.options{ display:grid; grid-template-columns:repeat(auto-fit,minmax(210px,1fr)); gap:10px; }
+.option{ position:relative; display:flex; gap:12px; align-items:flex-start; border:2px solid var(--line); border-radius:14px; padding:14px 16px; cursor:pointer; background:var(--soft); }
+.option input{ width:22px; height:22px; margin-top:3px; flex:0 0 auto; accent-color:var(--ink); }
+.option:has(input:checked){ border-color:var(--ink); background:var(--paper); box-shadow:inset 6px 0 0 var(--c,var(--ink)); }
+.option b{ display:block; font-size:1.05rem; }
+.option span.d{ display:block; color:var(--muted); font-size:.92rem; }
+.option.disabled{ opacity:.8; cursor:default; }
+.startbar{ display:flex; flex-wrap:wrap; gap:12px; align-items:center; margin-top:20px; }
+.msg{ color:var(--ko); font-weight:700; }
+
+/* en-tête de mission et ligne de trajet */
+.mission-head{ margin-top:14px; background:var(--paper); border-radius:18px; border:1px solid var(--line); overflow:hidden; }
+.mh-top{ padding:20px 22px 6px; }
+.badges{ display:flex; flex-wrap:wrap; gap:8px; align-items:center; }
+.role{ display:inline-block; background:var(--m); color:#fff; font-weight:700; border-radius:6px; padding:3px 10px; font-size:.9rem; }
+.lvl{ display:inline-block; border:2px solid var(--ink); border-radius:6px; padding:1px 8px; font-weight:700; font-size:.9rem; }
+.linkbtn{ background:none; border:0; padding:6px 4px; min-height:44px; text-decoration:underline; cursor:pointer; color:var(--ink); font-size:.92rem; }
+.mh-top h2{ font-size:2rem; font-weight:900; margin-top:8px; }
+.mh-top p{ margin:6px 0 0; max-width:68ch; color:var(--muted); }
+.route{ overflow-x:auto; padding:22px 22px 20px; }
+.line{ display:flex; align-items:flex-start; min-width:max-content; list-style:none; margin:0; padding:0; }
+.stop{ display:flex; flex-direction:column; align-items:center; width:120px; text-align:center; }
+.stop .pin{ width:26px; height:26px; border-radius:50%; background:var(--paper); border:5px solid var(--mt); }
+.stop.end .pin{ background:var(--mt); }
+.stop .nm{ font-weight:700; font-size:.88rem; margin-top:6px; line-height:1.2; }
+.seg{ flex:0 0 90px; position:relative; height:26px; }
+.seg::before{ content:""; position:absolute; left:-47px; right:-47px; top:9px; height:8px; border-radius:4px; background:repeating-linear-gradient(90deg,var(--mt) 0 10px,transparent 10px 18px); }
+.seg.ok::before{ background:var(--mt); }
+.seg .ico{ position:absolute; left:50%; top:-26px; transform:translateX(-50%); font-size:1.15rem; }
+.compact .stop{ width:84px; }
+.compact .seg{ flex-basis:22px; }
+.compact .seg::before{ left:-29px; right:-29px; }
+.stop.off .pin{ border-color:var(--line); }
+.stop.off .nm{ color:var(--muted); }
+.seg.off::before{ background:var(--line); }
+.progress{ padding:0 22px 18px; color:var(--muted); font-size:.95rem; }
+
+/* étapes */
+.steps{ list-style:none; padding:0; margin:18px 0 0; }
+.step{ background:var(--paper); border:1px solid var(--line); border-left:6px solid var(--m); border-radius:14px; padding:18px 20px; margin-bottom:14px; }
+.step h3{ font-size:1.2rem; font-weight:800; display:flex; gap:10px; align-items:baseline; flex-wrap:wrap; }
+.num{ flex:0 0 auto; display:inline-grid; place-items:center; width:32px; height:32px; border-radius:50%; background:var(--m); color:#fff; font-size:1rem; }
+.step h3 .md{ font-family:"Atkinson Hyperlegible",sans-serif; font-weight:400; font-size:.95rem; color:var(--muted); }
+.task{ margin:8px 0 12px; max-width:72ch; }
+.links{ display:flex; flex-wrap:wrap; gap:8px; margin-bottom:14px; }
+.lk{ display:inline-flex; align-items:center; gap:6px; min-height:44px; text-decoration:none; font-weight:700; border:2px solid var(--mt); border-radius:10px; padding:8px 12px; background:var(--soft); }
+.lk:hover{ background:var(--m); color:#fff; border-color:var(--m); }
+.fields{ display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:10px; align-items:end; }
+.fields > label, .fields > .fld{ display:flex; flex-direction:column; font-size:.9rem; color:var(--muted); gap:4px; }
+.fields .wide{ grid-column:1/-1; }
+fieldset.fld{ border:0; padding:0; margin:0; min-width:0; }
+fieldset.fld legend{ padding:0; margin-bottom:4px; }
+.dur{ display:flex; gap:6px; align-items:center; }
+input[type=number],input[type=text],textarea{ width:100%; min-height:44px; border:2px solid var(--line); border-radius:10px; padding:8px 10px; background:var(--soft); }
+input[type=number]{ -moz-appearance:textfield; }
+input:focus,textarea:focus{ border-color:var(--mt); }
+.dur input{ width:78px; }
+.dur span{ color:var(--ink); font-weight:700; }
+details.hint{ margin-top:12px; }
+details summary{ cursor:pointer; font-weight:700; color:var(--mt); width:max-content; max-width:100%; min-height:44px; display:flex; align-items:center; }
+details.hint p{ margin:4px 0 0; background:var(--soft); border-radius:10px; padding:10px 14px; max-width:72ch; }
+.given{ display:flex; flex-wrap:wrap; align-items:baseline; gap:4px 10px; background:var(--soft); border:1px solid var(--line); border-radius:10px; padding:8px 12px; margin-bottom:10px; max-width:74ch; }
+.gbadge{ font-size:.82rem; font-weight:700; color:var(--muted); }
+.glab{ flex:1 1 auto; }
+.given small{ flex-basis:100%; color:var(--muted); font-size:.82rem; }
+.onenav{ display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:14px; }
+.say{ display:inline-grid; place-items:center; min-width:40px; min-height:40px; border:2px solid var(--line); border-radius:50%; background:var(--paper); cursor:pointer; font-size:1rem; vertical-align:middle; margin-left:6px; }
+.say:hover{ border-color:var(--ink); }
+.say.on{ background:var(--ink); color:var(--paper); }
+
+/* totaux */
+.totals{ display:flex; flex-wrap:wrap; gap:12px; margin:6px 0 18px; }
+.tot{ flex:1 1 200px; background:var(--m); color:#fff; border-radius:14px; padding:14px 18px; }
+.tot b{ display:block; font-family:"Overpass",sans-serif; font-size:1.7rem; font-weight:900; }
+
+/* questions */
+.qs{ background:var(--paper); border:1px solid var(--line); border-radius:14px; padding:18px 20px; margin-bottom:14px; }
+.qs > h3{ font-size:1.3rem; font-weight:800; margin-bottom:10px; }
+.q{ margin-bottom:18px; }
+.q > label{ display:block; font-weight:700; margin-bottom:6px; }
+.q textarea{ min-height:96px; resize:vertical; }
+.words{ display:flex; flex-wrap:wrap; gap:6px; margin-top:8px; }
+.word{ min-height:40px; border:2px dashed var(--mt); border-radius:999px; padding:4px 12px; font-size:.9rem; background:none; cursor:pointer; }
+.word:hover{ background:var(--soft); }
+.starter{ margin-top:8px; min-height:44px; border:2px solid var(--mt); background:var(--soft); border-radius:10px; padding:6px 12px; cursor:pointer; text-align:left; }
+.bonus{ border-top:1px solid var(--line); padding-top:14px; }
+.corr{ margin-top:10px; display:flex; flex-wrap:wrap; align-items:center; gap:10px; }
+.cnote{ font-size:.88rem; color:var(--muted); }
+.ctext{ flex-basis:100%; margin:0; border-left:6px solid var(--ok); background:var(--soft); border-radius:8px; padding:10px 14px; max-width:72ch; }
+.ctext strong{ color:var(--ok); }
+.doc{ margin:6px 0 12px; border:2px solid var(--line); border-radius:12px; padding:4px 14px 10px; background:var(--soft); max-width:74ch; }
+.doc p{ margin:8px 0; }
+.doc .src{ font-size:.85rem; color:var(--muted); }
+.cmp{ margin-top:10px; }
+.cmp small{ color:var(--muted); }
+.actions{ display:flex; flex-wrap:wrap; gap:10px; margin:6px 0 30px; }
+.btn{ min-height:44px; border:2px solid var(--ink); border-radius:10px; padding:10px 16px; font-weight:700; cursor:pointer; background:var(--ink); color:var(--paper); }
+.btn.alt{ background:var(--paper); color:var(--ink); border-color:var(--line); }
+.btn:disabled{ opacity:.5; cursor:not-allowed; }
+.toast{ position:fixed; left:50%; bottom:calc(20px + env(safe-area-inset-bottom,0px)); transform:translateX(-50%); background:var(--ink); color:var(--paper); padding:12px 18px; border-radius:10px; opacity:0; transition:opacity .2s; pointer-events:none; max-width:90vw; z-index:60; }
+.toast.show{ opacity:1; }
+
+.teacher{ background:var(--soft); border:2px dashed var(--muted); border-radius:14px; padding:14px 18px; margin-top:14px; }
+.teacher h3{ font-size:1.05rem; margin-bottom:6px; }
+.teacher ul{ margin:0; padding-left:20px; }
+
+/* bilan */
+.tablewrap{ overflow-x:auto; background:var(--paper); border:1px solid var(--line); border-radius:14px; margin-top:14px; }
+table{ border-collapse:collapse; width:100%; min-width:760px; }
+caption{ text-align:left; padding:12px 12px 0; font-weight:700; }
+th,td{ text-align:left; padding:10px 12px; border-bottom:1px solid var(--line); vertical-align:top; }
+th{ font-family:"Overpass",sans-serif; font-weight:800; font-size:.95rem; }
+td input{ min-width:90px; }
+.mname{ font-weight:700; color:var(--c); }
+@media (prefers-color-scheme:dark){ :root:not([data-theme="light"]):not(.hc) .mname{ color:var(--cl); } }
+:root[data-theme="dark"]:not(.hc) .mname{ color:var(--cl); }
+.unit{ display:block; color:var(--muted); font-size:.8rem; margin-top:2px; }
+.bars{ background:var(--paper); border:1px solid var(--line); border-radius:14px; padding:18px 20px; margin-top:14px; }
+.bar{ display:grid; grid-template-columns:170px 1fr 120px; gap:10px; align-items:center; margin:8px 0; }
+.bar .track{ background:var(--soft); border:1px solid var(--line); border-radius:6px; height:22px; overflow:hidden; }
+.bar .fill{ height:100%; background:var(--c); }
+.bar .v{ font-weight:700; font-variant-numeric:tabular-nums; }
+
+/* séance guidée */
+.slide{ background:var(--paper); border:1px solid var(--line); border-left:8px solid var(--m); border-radius:16px; padding:22px 24px; margin-top:14px; }
+.snum{ color:var(--mt); font-weight:700; }
+.slide h3{ font-size:1.8rem; font-weight:900; margin:4px 0 10px; }
+.screen{ background:var(--soft); border-radius:10px; padding:10px 14px; color:var(--muted); max-width:75ch; }
+.gq{ font-size:1.35rem; font-weight:700; max-width:60ch; margin:16px 0 14px; }
+.ga{ font-size:1.2rem; border-left:6px solid var(--ok); background:var(--soft); border-radius:10px; padding:12px 16px; max-width:70ch; }
+.tracetxt{ font-size:1.25rem; line-height:2.2; max-width:65ch; }
+.drop{ display:inline-block; min-width:7.5em; min-height:1.8em; line-height:1.5; vertical-align:middle; border:2px dashed var(--mt); border-radius:8px; padding:0 8px; margin:2px; background:var(--soft); color:var(--mt); font-weight:700; cursor:pointer; }
+.drop.full{ border-style:solid; touch-action:none; user-select:none; }
+.drop.hover{ background:var(--m); color:#fff; }
+.drop.ok{ border-color:var(--ok); color:var(--ok); }
+.drop.ko{ border-color:var(--ko); color:var(--ko); border-style:double; border-width:4px; }
+.drop.ok::after{ content:" ✓"; }
+.drop.ko::after{ content:" ✗"; }
+.bank{ display:flex; flex-wrap:wrap; gap:10px; margin-top:16px; padding:14px; border-radius:12px; background:var(--soft); border:1px solid var(--line); min-height:60px; list-style:none; }
+.chip{ display:inline-flex; align-items:center; min-height:44px; background:var(--paper); border:2px solid var(--mt); border-radius:999px; padding:6px 16px; font-weight:700; font-size:1.05rem; cursor:grab; touch-action:none; user-select:none; }
+.chip.sel,.chip[aria-pressed="true"]{ background:var(--ink); color:var(--paper); border-color:var(--ink); outline:3px solid var(--mt); }
+.chip.ghost{ position:fixed; z-index:50; pointer-events:none; transform:translate(-50%,-60%); box-shadow:0 6px 16px rgba(0,0,0,.25); }
+.tstat{ font-weight:700; margin:10px 0 0; min-height:1.5em; }
+.snav{ display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap; margin-top:14px; }
+.dots{ display:flex; gap:4px; }
+.sdot{ width:36px; height:36px; border:0; background:none; padding:0; cursor:pointer; display:grid; place-items:center; }
+.sdot::before{ content:""; width:14px; height:14px; border-radius:50%; border:2px solid var(--mt); }
+.sdot[aria-current="step"]::before{ background:var(--mt); }
+
+footer{ color:var(--muted); font-size:.9rem; padding:10px 0 30px; display:flex; flex-wrap:wrap; gap:10px; align-items:center; }
+footer label{ display:flex; align-items:center; gap:6px; }
+footer input{ width:130px; }
+
+@media (max-width:560px){ .bar{ grid-template-columns:1fr 100px; } .bar .n{ grid-column:1/-1; } .mh-top h2,.card h2{ font-size:1.6rem; } .slide h3{ font-size:1.45rem; } }
+:root.calm *,:root.calm *::before{ transition:none!important; animation:none!important; scroll-behavior:auto!important; }
+@media (prefers-reduced-motion:reduce){ *{ transition:none!important; animation:none!important; } }
+@media print{ header.top,#a11y,nav.picker,footer,.actions,.say{ display:none!important; } }
+</style>
+</head>
+<body>
+<a class="skip" href="#view">Aller au contenu</a>
+<header class="top">
+  <div class="wrap">
+    <h1>Londres, connectée au monde
+      <small>Géographie 4e · Programmez votre trajet depuis La Grand-Combe</small></h1>
+    <button class="ibtn" id="a11yBtn" aria-expanded="false" aria-controls="a11y"><span aria-hidden="true">👁️ </span>Affichage et lecture</button>
+    <div class="timer" id="timer">
+      <span class="sr">Minuteur :</span><span class="t" id="tval" role="timer" aria-live="off">30:00</span>
+      <button class="ibtn" id="tgo">Démarrer</button>
+      <button class="ibtn" id="tplus" aria-label="Ajouter 5 minutes">+5 min</button>
+      <button class="ibtn" id="treset" aria-label="Remettre le minuteur à 30 minutes"><span aria-hidden="true">↺</span></button>
+    </div>
+  </div>
+</header>
+
+<section id="a11y" hidden aria-labelledby="a11yTitle">
+  <div class="wrap">
+    <h2 id="a11yTitle">Adapter l’affichage et la lecture</h2>
+    <div class="a11y-grid">
+      <fieldset><legend>Taille du texte</legend>
+        <div class="seg-choice">
+          <label><input type="radio" name="fs" value="0"> Normale</label>
+          <label><input type="radio" name="fs" value="1"> Grande</label>
+          <label><input type="radio" name="fs" value="2"> Très grande</label>
+        </div></fieldset>
+      <fieldset><legend>Couleurs</legend>
+        <div class="seg-choice">
+          <label><input type="radio" name="theme" value="auto"> Automatique</label>
+          <label><input type="radio" name="theme" value="light"> Clair</label>
+          <label><input type="radio" name="theme" value="dark"> Sombre</label>
+        </div></fieldset>
+      <label class="opt"><input type="checkbox" data-a="hc"><span>Contraste élevé<small>Noir sur blanc, bordures épaisses</small></span></label>
+      <label class="opt"><input type="checkbox" data-a="sp"><span>Espacement renforcé<small>Lettres, mots et lignes plus espacés (dyslexie)</small></span></label>
+      <label class="opt"><input type="checkbox" data-a="tts" id="ttsBox"><span>Boutons d’écoute<small id="ttsNote">Un bouton 🔊 lit à voix haute consignes, questions et corrections</small></span></label>
+      <label class="opt"><input type="checkbox" data-a="slow"><span>Lecture plus lente</span></label>
+      <label class="opt"><input type="checkbox" data-a="one"><span>Une étape à la fois<small>Affiche les étapes une par une</small></span></label>
+      <label class="opt"><input type="checkbox" data-a="calm"><span>Supprimer les animations</span></label>
+      <label class="opt"><input type="checkbox" data-a="notimer"><span>Masquer le minuteur</span></label>
+    </div>
+  </div>
+</section>
+
+<div class="wrap">
+  <nav class="picker" id="picker" aria-label="Missions"></nav>
+  <main id="view" tabindex="-1"></main>
+  <footer>
+    <span>Durées et prix : faites vos recherches pour le <b id="refdate"></b>.</span>
+    <span style="flex:1"></span>
+    <button class="ibtn" id="resetAll">Effacer mes réponses</button>
+    <label>Code enseignant <input type="text" id="tcode" autocomplete="off"></label>
+  </footer>
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+const g = (o,d,m) => `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(o)}&destination=${encodeURIComponent(d)}&travelmode=${m}`;
+const gs = q => `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(q)}`;
+const L = {
+  flights:{label:"Google Vols", url:"https://www.google.com/travel/flights"},
+  ter:{label:"TER Occitanie", url:"https://www.ter.sncf.com/occitanie"},
+  sncf:{label:"SNCF Connect", url:"https://www.sncf-connect.com"},
+  eurostar:{label:"Eurostar", url:"https://www.eurostar.com/fr-fr"},
+  flix:{label:"FlixBus", url:"https://www.flixbus.fr"},
+  tfl:{label:"Transports de Londres (TfL)", url:"https://tfl.gov.uk/plan-a-journey"},
+  mt:{label:"MarineTraffic", url:"https://www.marinetraffic.com"}
+};
+
+const MISSIONS = [
+{ id:"avion", color:"#C2185B", light:"#F48FB1", icon:"✈️", tab:"Touristes · avion",
+  role:"Vous êtes des touristes", title:"Visiter le British Museum",
+  intro:"Vous partez de La Grand-Combe pour visiter le British Museum, au cœur de Londres. Trouvez le trajet le plus pratique.",
+  stops:["La Grand-Combe","Aéroport de Montpellier","Londres-Gatwick","British Museum"],
+  steps:[
+    {l2:{label:"La Grand-Combe → aéroport de Montpellier en transports en commun (TER + navette)", m:150, p:20}, mode:"🚆", md:"train et navette, ou voiture", task:"Trouvez comment rejoindre l’aéroport de Montpellier. Comparez les transports en commun et la voiture.",
+     links:[{label:"Itinéraire en transports en commun",url:g("Gare de La Grand-Combe-La Pise","Aéroport Montpellier Méditerranée","transit")},{label:"Itinéraire en voiture",url:g("La Grand-Combe","Aéroport Montpellier Méditerranée","driving")}],
+     hint:"Google Maps propose le TER jusqu’à Nîmes puis Montpellier, puis une navette vers l’aéroport. Gardez le trajet le plus simple pour des touristes."},
+    {mode:"✈️", md:"avion", task:"Trouvez un vol direct Montpellier → Londres-Gatwick. Notez la durée du vol et son prix. Le temps d’attente à l’aéroport est déjà compté.", fixed:[{label:"Attente à l’aéroport (contrôles, embarquement)", m:90, src:"moyenne conseillée par les compagnies"}],
+     links:[L.flights],
+     hint:"Il n’y a pas de vol direct vers Heathrow : cherchez Gatwick (LGW). Attention, il est 1 h de moins à Londres : ne calculez pas la durée avec les heures affichées, lisez la durée du vol."},
+    {l3:{label:"Gatwick → British Museum en train et métro", m:70, p:20}, mode:"🚇", md:"train et métro", task:"De Gatwick, trouvez comment rejoindre le British Museum en transports en commun.",
+     links:[{label:"Itinéraire Google Maps",url:g("Gatwick Airport","British Museum, London","transit")},L.tfl],
+     hint:"Le prix est en livres sterling (£) : utilisez le taux fourni et arrondissez.", fixed:[{label:"1 £ ≈ 1,15 € : multipliez les prix en livres par 1,15", info:true, src:"taux de change arrondi"}]}
+  ],
+  questions:[
+    {st:"L’aller-retour coûte environ … € car …", q:"Estimez le prix d’un aller-retour pour une personne (même trajet).", hint:"Doublez votre prix total.", c:"Un aller simple coûte environ 110 à 200 € : ~20 € pour rejoindre l’aéroport, 50 à 150 € pour le vol, ~20 € de train et métro à Londres. L’aller-retour revient donc à environ 220 à 400 €. C’est surtout le prix du vol qui varie, selon la date et le moment où l’on réserve."},
+    {st:"Londres est facile d’accès pour les touristes car elle possède …", q:"Montrez que Londres est facilement accessible aux touristes du monde entier.", c:"Londres possède 5 aéroports internationaux (Heathrow, Gatwick, Stansted, Luton, City) qui reçoivent des vols du monde entier. Même depuis une petite ville du Gard, on y arrive en moins de 8 h grâce à un vol direct de 2 h. Des trains rapides et le métro relient les aéroports au centre. Londres est une métropole mondiale, un hub qui accueille d’importants flux de touristes.", words:["5 aéroports","aéroport international","hub","métropole mondiale","flux de touristes"]}
+  ],
+  bonus:"Combien d’aéroports compte Londres ? Cherchez lequel est le plus fréquenté.", bonusC:"Londres compte 5 aéroports internationaux. Heathrow est le plus fréquenté : plus de 80 millions de passagers par an, l’un des plus grands aéroports du monde.",
+  teacher:["La Grand-Combe → aéroport : ~1 h 15 en voiture ; 2 h 30 à 3 h en transports (TER via Nîmes + navette).","Vol easyJet Montpellier → Gatwick direct, ~1 h 55, prix de ~50 à 150 € selon la date. Pas de direct vers Heathrow.","Gatwick → British Museum : Thameslink ou Gatwick Express + métro, ~1 h à 1 h 15, ~15 à 25 £.","Total réaliste avec l’attente aéroport : 6 h 30 à 7 h 30."]
+},
+{ id:"train", color:"#1B7F55", light:"#6FD3A5", icon:"🚄", tab:"Cadres · train",
+  role:"Vous êtes des cadres d’entreprise", title:"Rejoindre Canary Wharf",
+  intro:"Vous partez de La Grand-Combe pour une réunion dans le quartier d’affaires de Canary Wharf. Vous voyagez uniquement en train.",
+  stops:["La Grand-Combe","Paris Gare de Lyon","Paris Gare du Nord","Londres St Pancras","Canary Wharf"],
+  steps:[
+    {mode:"🚄", md:"TER puis TGV", task:"Cherchez un trajet La Grand-Combe → Paris Gare de Lyon (TER jusqu’à Nîmes, puis TGV). Notez la durée et le prix.",
+     links:[L.sncf,L.ter],
+     hint:"Sur SNCF Connect, tapez « La Grand-Combe » et « Paris Gare de Lyon » : le site trouve seul la correspondance à Nîmes."},
+    {l2:{label:"Trajet en RER D, Gare de Lyon → Gare du Nord", m:15}, mode:"🚇", md:"RER", task:"À Paris, changez de gare : Gare de Lyon → Gare du Nord.",
+     links:[{label:"Itinéraire Google Maps",url:g("Gare de Lyon, Paris","Gare du Nord, Paris","transit")}],
+     hint:"Le RER D relie directement les deux gares. Le prix du ticket est déjà compté.", fixed:[{label:"Ticket de RER", p:2.5, src:"tarif Île-de-France Mobilités"}]},
+    {mode:"🚄", md:"Eurostar", task:"Trouvez un Eurostar Paris Gare du Nord → Londres St Pancras. Le temps des contrôles avant le départ est déjà compté.", fixed:[{label:"Contrôles avant le départ (passeport, douane)", m:60, src:"délai conseillé par Eurostar"}],
+     links:[L.eurostar],
+     hint:"Le trajet dure un peu plus de 2 h. Les prix changent beaucoup selon la date et l’heure."},
+    {l3:{label:"St Pancras → Canary Wharf en métro", m:30, p:3}, mode:"🚇", md:"métro", task:"De St Pancras, rejoignez Canary Wharf en métro.",
+     links:[{label:"Itinéraire Google Maps",url:g("St Pancras International, London","Canary Wharf, London","transit")},L.tfl],
+     hint:"Plusieurs lignes sont possibles (Jubilee, Elizabeth line, DLR). Choisissez la plus rapide."}
+  ],
+  questions:[
+    {st:"Nous avons fait … changements : à …", q:"Combien de changements avez-vous faits au total ?", c:"4 changements : à Nîmes (TER → TGV), à Paris Gare de Lyon (TGV → RER D), à Paris Gare du Nord (RER → Eurostar) et à Londres St Pancras (Eurostar → métro). Il peut y en avoir un de plus dans le métro londonien."},
+    {st:"L’Eurostar est un train … qui passe sous … Il relie Londres à …", q:"Qu’est-ce que l’Eurostar ? Expliquez pourquoi c’est un symbole de l’intégration de Londres dans l’Europe.", c:"L’Eurostar est un train à grande vitesse qui relie Londres à Paris, Bruxelles et Amsterdam en passant par le tunnel sous la Manche, ouvert en 1994. Il place Paris à un peu plus de 2 h de Londres, de centre-ville à centre-ville. Même après le Brexit (2020), il circule tous les jours : Londres reste branchée sur le réseau européen de grande vitesse.", words:["tunnel sous la Manche","1994","Paris, Bruxelles, Amsterdam","grande vitesse","Brexit"]}
+  ],
+  bonus:"Pourquoi une entreprise installe-t-elle ses bureaux à Canary Wharf plutôt qu’en banlieue lointaine ?", bonusC:"Canary Wharf est un quartier d’affaires qui regroupe des banques et des sièges de grandes entreprises. Il est très bien desservi (métro, Elizabeth line, DLR, aéroport de London City tout proche). Les entreprises veulent être proches les unes des autres, de leurs clients et des voyageurs internationaux.",
+  teacher:["TER La Grand-Combe → Nîmes ~50 min ; TGV Nîmes → Paris Gare de Lyon ~3 h.","RER D Gare de Lyon → Gare du Nord ~10 min (+ correspondance).","Eurostar ~2 h 20 + ~1 h de contrôles. St Pancras → Canary Wharf ~25 à 35 min.","Total : 8 h 30 à 9 h 30, prix très variable (150 à 350 €)."]
+},
+{ id:"bus", color:"#8C5E00", light:"#F2C14E", icon:"🚌", tab:"Étudiants · bus",
+  role:"Vous êtes étudiants", title:"Rejoindre l’université de Londres",
+  intro:"Vous partez de La Grand-Combe pour rejoindre l’université de Londres, dans le quartier de Bloomsbury. Votre budget est serré.",
+  stops:["La Grand-Combe","Nîmes","Victoria Coach Station","Bloomsbury"],
+  steps:[
+    {l2:{label:"TER La Grand-Combe → Nîmes", m:50, p:12}, mode:"🚆", md:"TER", task:"Trouvez un train La Grand-Combe → Nîmes. Notez le prix et la durée.",
+     links:[L.ter],
+     hint:"Gare de départ : « La Grand-Combe-La Pise ». Gare d’arrivée : « Nîmes Centre »."},
+    {mode:"🚌", md:"autocar FlixBus", task:"Trouvez un bus Nîmes → Londres Victoria Coach Station (la gare routière). Notez le prix, la durée et le nombre de changements.",
+     links:[L.flix],
+     hint:"Le trajet dure presque une journée entière, souvent avec des changements de bus. C’est normal : c’est le trajet le moins cher."},
+    {l3:{label:"Victoria Coach Station → Bloomsbury en métro", m:20, p:3}, mode:"🚇", md:"métro", task:"De Victoria Coach Station, trouvez le transport en commun le plus rapide jusqu’à l’université (Senate House).",
+     links:[{label:"Itinéraire Google Maps",url:g("Victoria Coach Station, London","Senate House, University of London","transit")},L.tfl],
+     hint:"Cherchez la ligne de métro Victoria (couleur bleu clair).", fixed:[{label:"1 £ ≈ 1,15 € : multipliez les prix en livres par 1,15", info:true, src:"taux de change arrondi"}]}
+  ],
+  questions:[
+    {st:"Le bus peut traverser la Manche soit …, soit …", q:"Comment le bus traverse-t-il la Manche ? Donnez les deux solutions possibles.", c:"Soit par la navette Eurotunnel (Le Shuttle) : le bus monte dans un train qui passe dans le tunnel sous la Manche, entre Calais (Coquelles) et Folkestone, en 35 min environ. Soit par le ferry entre Calais et Douvres, en 1 h 30 environ.", words:["tunnel sous la Manche","navette Eurotunnel","ferry","Calais","Douvres"]},
+    {st:"Le bus est plus avantageux car … mais il est moins avantageux car …", q:"Comparez votre trajet avec celui des cadres (train) ou des touristes (avion) : qu’est-ce qui est plus avantageux, qu’est-ce qui l’est moins ?", compare:true, hint:"Utilisez le tableau « Pour comparer » juste en dessous : comparez d’abord les durées, puis les prix. Vous pouvez aussi demander leurs résultats aux groupes voisins.", c:"Le bus est le trajet le moins cher (environ 100 à 150 € au total), mais le plus long : plus de 20 h, avec des changements. Le train est plus cher (150 à 350 €) mais deux fois plus rapide (environ 9 h). L’avion est souvent le plus rapide (environ 7 h). Chacun choisit selon son budget et son temps : Londres est accessible à tous les budgets."}
+  ],
+  bonus:"Pourquoi Londres attire-t-elle des étudiants du monde entier ?", bonusC:"Londres compte de nombreuses universités réputées, on y parle anglais (la langue internationale), on y trouve des emplois et une vie culturelle très riche. C’est une métropole mondiale qui attire les talents.",
+  teacher:["TER La Grand-Combe → Nîmes ~50 min, ~10 à 13 €.","FlixBus Nîmes → Victoria Coach Station : ~20 à 24 h, souvent 1 à 2 changements, ~80 à 130 €.","Victoria → Bloomsbury ~20 min de métro, ~3 £.","Traversée : navette Eurotunnel ou ferry selon la ligne (d’où la reformulation de la question)."]
+},
+{ id:"camion", ref:{h:36, p:2800, unit:"par camion"}, color:"#6446C8", light:"#B7A4F5", icon:"🚚", tab:"Transporteurs · camion",
+  role:"Vous êtes transporteurs routiers", title:"Livrer des pélardons à Covent Garden",
+  intro:"Votre camion transporte une cargaison de pélardons (fromage de chèvre des Cévennes) de La Grand-Combe jusqu’à Covent Garden, au centre de Londres.",
+  stops:["La Grand-Combe","Calais","Douvres","Covent Garden"],
+  steps:[
+    {l3:{label:"La Grand-Combe → Calais : environ 1 000 km et 15 h de conduite en camion", m:900, p:2000}, mode:"🚚", md:"route", task:"Trouvez l’itinéraire routier le plus rapide jusqu’au port de Calais. Notez la distance, la durée et les autoroutes principales.",
+     links:[{label:"Itinéraire Google Maps",url:g("La Grand-Combe","Port de Calais","driving")}],
+     hint:"Google Maps calcule pour une voiture. Un camion roule moins vite (90 km/h) et le chauffeur doit faire des pauses : comptez environ 1,5 fois plus de temps. Pour le prix, multipliez la distance par 2 (voir le tarif fourni).", fixed:[{label:"Tarif d’un camion frigorifique : environ 2 € par km (chauffeur, gazole, péages)", info:true, src:"ordre de grandeur des transporteurs"}]},
+    {mode:"⛴️", md:"ferry", task:"Traversez la Manche en ferry de Calais à Douvres (Dover). Ces données ne se trouvent pas facilement en ligne : elles vous sont fournies. Repérez simplement la traversée sur la carte.", givenOnly:true, fixed:[{label:"Traversée Calais → Douvres, camion et chauffeur", m:90, p:400, src:"ordre de grandeur retenu pour l’exercice"}],
+     links:[{label:"Voir le trajet sur la carte",url:g("Port de Calais","Port of Dover","driving")}],
+     hint:"Si Google Maps propose « Le Shuttle » (le train du tunnel), c’est une autre solution. Pour cette mission, gardez le ferry."},
+    {l2:{label:"Douvres → Covent Garden : 120 km, environ 2 h", m:120, p:240}, l2only:true, mode:"🚚", md:"route", task:"De Douvres, rejoignez Covent Garden. Notez la distance, la durée et le prix.",
+     links:[{label:"Itinéraire Google Maps",url:g("Port of Dover","Covent Garden, London","driving")}],
+     hint:"Attention : au Royaume-Uni, on roule à gauche ! Pour le prix, multipliez la distance par 2.", fixed:[{label:"Même tarif : environ 2 € par km", info:true, src:"ordre de grandeur des transporteurs"}]}
+  ],
+  questions:[
+    {st:"Le camion emprunte surtout les autoroutes …", q:"Quelles sont les autoroutes les plus empruntées par votre camion ?", c:"Selon l’itinéraire proposé : la N106 puis l’A9 jusqu’à la vallée du Rhône, l’A7 (autoroute du Soleil) jusqu’à Lyon, puis l’A6 ou l’A31 vers le nord, l’A26 (« autoroute des Anglais ») et l’A16 jusqu’à Calais. Au Royaume-Uni : la M20 puis l’A20 jusqu’à Londres.", words:["A7","A6","A26","A16","M20"]},
+    {st:"Le ferry est une solution car le Royaume-Uni est … et …", q:"Expliquez pourquoi le ferry est une solution possible pour le transport routier vers le Royaume-Uni.", c:"Le Royaume-Uni est une île : il faut traverser la Manche. Le pas de Calais est le passage le plus court (environ 33 km). Les ferries partent très souvent et embarquent directement les camions : à l’arrivée, le camion reprend la route sans que la marchandise soit déchargée.", words:["île","Manche","trajet court","nombreux départs","camions embarqués"]}
+  ],
+  bonus:"Les pélardons sont un produit frais. Quel type de camion faut-il ? Quels contrôles depuis le Brexit ?", bonusDoc:{title:"Document : les pélardons et le Brexit",
+    paras:["Depuis le 1er janvier 2021, le Royaume-Uni ne fait plus partie de l’Union européenne. Les marchandises qui y entrent doivent donc passer la douane, comme si elles venaient d’un pays lointain.",
+      "Pour les aliments d’origine animale, comme la viande ou les fromages, les règles sont plus strictes depuis le 31 janvier 2024 : chaque cargaison doit être accompagnée d’un certificat sanitaire signé par un vétérinaire, qui prouve que les produits sont sains. À la frontière, les agents britanniques peuvent vérifier les papiers et ouvrir le camion pour contrôler la marchandise.",
+      "Ces démarches prennent du temps et coûtent de l’argent. Pour un produit frais comme le pélardon, qui doit rester au froid, chaque heure d’attente compte.",
+      "Depuis 2025, l’Union européenne et le Royaume-Uni discutent d’un accord pour simplifier ces contrôles."],
+    src:[{label:"Réussir, « Brexit : des certificats sanitaires pour exporter au Royaume-Uni » (février 2024)", url:"https://www.reussir.fr/articles/brexit-des-certificats-sanitaires-pour-exporter-au-royaume-uni"},
+         {label:"Douane française, « Contrôles sanitaires à l’importation au Royaume-Uni »", url:"https://www.douane.gouv.fr/fiche/controles-sanitaires-et-phytosanitaires-limportation-au-royaume-uni"}]}, bonusC:"Il faut un camion frigorifique pour garder les fromages au froid. Depuis le Brexit, le Royaume-Uni ne fait plus partie de l’Union européenne : il faut une déclaration en douane et, depuis 2024, un certificat sanitaire signé par un vétérinaire pour les produits laitiers. Des contrôles peuvent avoir lieu à la frontière. Cela prend du temps et fait monter les coûts.",
+  teacher:["La Grand-Combe → Calais : ~1 000 km, ~10 h en voiture ; en camion (90 km/h, pauses, 9 h de conduite/jour max) 1,5 à 2 jours.","Axes : A7, puis A6 ou A26 (« autoroute des Anglais »), A16 ; M20 au Royaume-Uni.","Ferry Calais–Douvres ~1 h 30. Douvres → Covent Garden ~120 km, ~2 h.","Prix : ~2 €/km pour un camion frigorifique (1,45 à 1,65 €/km pour un semi standard selon le CNR, davantage en frigo) + ~400 € de ferry : environ 2 500 à 3 000 € le voyage.","Google Maps propose souvent Le Shuttle : les liens forcent le passage par les ports.","Brexit : un accord sanitaire UE–Royaume-Uni est en négociation depuis 2025, les règles peuvent évoluer."]
+},
+{ id:"navire", ref:{h:146, p:2000, unit:"par conteneur"}, color:"#0F6F8F", light:"#7FCBE3", icon:"🚢", tab:"Armateurs · navire (en classe)", guided:true,
+  modes:"porte-conteneurs, camion",
+  role:"Toute la classe, avec le professeur", title:"Livrer une usine à Alès",
+  intro:"Un porte-conteneurs part du port de London Gateway. Ses conteneurs sont destinés à l’usine NTN d’Alès. Suivons-le ensemble, étape par étape.",
+  stops:["London Gateway","Pas de Calais","Manche","Atlantique","Gibraltar","Méditerranée","Fos-Marseille","Usine d’Alès"],
+  steps:[],
+  slides:[
+    {upto:0, title:"D’où part notre conteneur ?", screen:"Ouvrir le port sur Google Maps, puis dézoomer jusqu’à voir Londres et la mer du Nord.",
+     links:[{label:"London Gateway sur Google Maps",url:gs("DP World London Gateway")}],
+     q:"Au bord de quel fleuve se trouve ce port ? Est-il dans Londres ?",
+     a:"Il est sur l’estuaire de la Tamise, à environ 40 km à l’est du centre de Londres, tout près de la mer du Nord."},
+    {upto:0, title:"Pourquoi un port ici, et pas en plein Londres ?", screen:"Passer en vue satellite et zoomer sur les quais, les grues et les entrepôts. Clic droit → « Mesurer une distance » jusqu’au centre de Londres.",
+     links:[{label:"Vue du port",url:gs("DP World London Gateway")}],
+     q:"Qu’est-ce qu’on voit autour des quais ? Pourquoi les très grands navires ne remontent-ils pas jusqu’au centre de Londres ?",
+     a:"C’est un port en eau profonde : les plus grands porte-conteneurs (jusqu’à 400 m de long) peuvent y accoster. Il y a de la place pour les grues et les entrepôts (une plateforme logistique). Le port est relié à l’autoroute M25 et au rail : les marchandises repartent vite vers Londres et tout le pays."},
+    {upto:2, title:"Des navires en direct", screen:"Ouvrir MarineTraffic et centrer la carte sur la Manche. Les cargos et porte-conteneurs apparaissent en vert.",
+     links:[{label:"MarineTraffic",url:"https://www.marinetraffic.com"}],
+     q:"Que remarquez-vous dans la Manche ?",
+     a:"Des centaines de navires ! Le pas de Calais et la Manche forment l’un des passages maritimes les plus fréquentés du monde : c’est une route majeure de la mondialisation."},
+    {upto:6, title:"Traçons la route jusqu’à Marseille", screen:"Sur Google Maps, clic droit → « Mesurer une distance », puis cliquer en suivant les côtes : Tamise, pas de Calais, Manche, pointe de la Bretagne, côtes de l’Espagne et du Portugal, Gibraltar, Méditerranée, Fos.",
+     links:[{label:"Google Maps (outil de mesure)",url:gs("Port de Fos-sur-Mer")}],
+     q:"Par quels mers, océan et détroits passe le navire ?",
+     a:"Le pas de Calais, la Manche, l’océan Atlantique (golfe de Gascogne, côtes de l’Espagne et du Portugal), le détroit de Gibraltar, puis la mer Méditerranée jusqu’au port de Fos-Marseille. Environ 3 500 km."},
+    {upto:6, title:"Combien de temps en mer ?", screen:"Écrire le calcul au tableau.",
+     links:[],
+     q:"Un porte-conteneurs parcourt environ 700 km par jour. Combien de jours faut-il pour faire 3 500 km ?",
+     a:"3 500 ÷ 700 = 5 jours. En réalité, comptez 5 à 7 jours avec les escales dans d’autres ports."},
+    {upto:7, title:"Le dernier trajet jusqu’à l’usine", screen:"Afficher l’itinéraire Fos → Alès sur Google Maps.",
+     links:[{label:"Itinéraire Fos → Alès",url:g("Port de Fos-sur-Mer","NTN Alès","driving")}],
+     q:"Le conteneur est déchargé à Fos. Comment rejoint-il l’usine d’Alès ?",
+     a:"Il est posé sur un camion (ou sur un train) sans être ouvert : environ 140 km et 1 h 45 de route. Passer d’un mode de transport à un autre avec la même « boîte », c’est l’intermodalité."},
+    {upto:7, title:"Combien coûte ce voyage ?", screen:"Écrire au tableau : bateau ~1 300 € + frais des ports ~300 € + camion Fos → Alès ~400 € = ~2 000 € pour un conteneur de 40 pieds.",
+     links:[],
+     q:"Transporter un conteneur de Londres jusqu’à Alès coûte environ 2 000 €. Il contient 10 000 pièces mécaniques. Combien coûte le transport d’une seule pièce ?",
+     a:"2 000 ÷ 10 000 = 0,20 €. Moins de 20 centimes par pièce pour 1 700 km de mer et de route ! Le conteneur rend le transport de marchandises très bon marché : c’est un des moteurs de la mondialisation."},
+    {upto:7, trace:true, title:"Trace écrite", screen:"Un élève vient au tableau glisser les étiquettes dans les trous (ou toucher une étiquette puis un trou). Attention, deux étiquettes sont des pièges.",
+     distract:["Seine","canal de Suez"], text:"Le port de London Gateway se trouve sur l’[estuaire de la Tamise], à 40 km de Londres. C’est un port en [eau profonde] qui accueille les plus grands [porte-conteneurs]. Pour rejoindre Marseille, le navire traverse la [Manche], longe l’océan [Atlantique] et franchit le détroit de [Gibraltar]. À Fos, le conteneur passe du bateau au camion : c’est l’[intermodalité]. Transporter un objet par conteneur coûte très peu : le transport maritime est [bon marché]. Londres est une [interface] entre le Royaume-Uni, l’Europe et le monde."}
+  ],
+  questions:[], bonus:"",
+  teacher:["Séance guidée à projeter : flèches du clavier ou boutons pour avancer.","MarineTraffic gratuit ne calcule pas d’itinéraire : on l’utilise seulement pour observer le trafic.","Les distances, durées et prix sont des ordres de grandeur. Le fret maritime varie beaucoup selon la période : on retient ~1 000 à 1 500 € la traversée pour un 40 pieds intra-européen."]
+}
+];
+
+
+const LEVELS = [
+  {id:1, name:"Parcours A", tag:"Autonome", desc:"Vous cherchez presque toutes les informations. Seules les données introuvables en ligne sont fournies."},
+  {id:2, name:"Parcours B", tag:"Guidé", desc:"Une étape est déjà remplie pour vous et des débuts de phrases vous aident à rédiger."},
+  {id:3, name:"Parcours C", tag:"Accompagné", desc:"Deux étapes sont remplies, les coups de pouce sont ouverts et des débuts de phrases vous aident."}
+];
+
+/* ---------- état ---------- */
+const KEY = "londres-4e-v2";
+let S = {};
+try{ S = JSON.parse(localStorage.getItem(KEY)) || JSON.parse(localStorage.getItem("londres-4e-v1")) || {}; }catch(e){ S = {}; }
+S.m = S.m || {}; S.bilan = S.bilan || {}; S.focus = S.focus || {};
+S.a11y = Object.assign({fs:0, theme:"auto", hc:false, sp:false, tts:false, slow:false, one:false, calm:false, notimer:false}, S.a11y||{});
+if(!S.level){ S.cur = "home"; }
+S.cur = S.cur || "home";
+let teacher = false;
+const save = () => { try{ localStorage.setItem(KEY, JSON.stringify(S)); }catch(e){} };
+const ms = id => (S.m[id] = S.m[id] || {steps:{}, q:{}});
+const TTS = "speechSynthesis" in window && "SpeechSynthesisUtterance" in window;
+
+(function(){
+  if(!S.ref){ const d=new Date(); d.setDate(d.getDate()+21); while(d.getDay()!==2) d.setDate(d.getDate()+1); S.ref=d.toISOString().slice(0,10); save(); }
+  document.getElementById("refdate").textContent = new Date(S.ref+"T12:00").toLocaleDateString("fr-FR",{weekday:"long",day:"numeric",month:"long"});
+})();
+
+const esc = s => String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const ic = e => `<span aria-hidden="true">${e}</span>`;
+const fmt = min => {
+  if(!min) return "—";
+  const h = Math.floor(min/60), m = min%60;
+  let s = (h?h+" h ":"") + (m?String(m).padStart(h?2:1,"0")+" min":"");
+  if(h>=24){ const j=Math.floor(h/24), r=h%24; s += ` (environ ${j} j ${r} h)`; }
+  return s.trim();
+};
+const eur = p => p.toLocaleString("fr-FR")+" €";
+const link = l => `<a class="lk" href="${l.url}" target="_blank" rel="noopener">${esc(l.label)}<span class="sr"> (s’ouvre dans un nouvel onglet)</span> <span aria-hidden="true">↗</span></a>`;
+const say = (text, what) => (S.a11y.tts && TTS) ? `<button class="say" type="button" data-say="${esc(text)}" aria-label="Écouter ${esc(what||"le texte")}">${ic("🔊")}</button>` : "";
+const lvl = () => S.level || 1;
+const LV = () => LEVELS[lvl()-1];
+
+/* étape vue selon le parcours */
+function sview(s){
+  let given = !!s.givenOnly, fixed = [...(s.fixed||[])];
+  if(lvl()>=2 && s.l2 && !(s.l2only && lvl()>=3)){ given = true; fixed.push({...s.l2, src:"donnée fournie pour votre parcours"}); }
+  if(lvl()>=3 && s.l3){ given = true; fixed.push({...s.l3, src:"donnée fournie pour votre parcours"}); }
+  return {given, fixed};
+}
+function totals(M){
+  const st = ms(M.id).steps; let t=0,p=0,done=0;
+  M.steps.forEach((s,i)=>{
+    const v=st[i]||{}, V=sview(s);
+    const d = V.given ? 0 : (+v.h||0)*60+(+v.m||0);
+    t+=d; if(!V.given) p+=(+v.p||0);
+    V.fixed.forEach(f=>{ if(!f.info){ t+=f.m||0; p+=f.p||0; } });
+    if(d>0||v.n||V.given) done++;
+  });
+  return {t,p,done};
+}
+function setColor(M){
+  const r=document.documentElement.style;
+  r.setProperty("--m", M?M.color:"#152033"); r.setProperty("--ml", M?M.light:"#EDF1F6");
+}
+
+/* ---------- affichage (accessibilité) ---------- */
+function applyA11y(){
+  const A=S.a11y, root=document.documentElement;
+  root.style.setProperty("--fs", [17,20,23][A.fs]+"px");
+  root.classList.toggle("hc", A.hc); root.classList.toggle("sp", A.sp); root.classList.toggle("calm", A.calm);
+  if(A.hc) root.setAttribute("data-theme","light");
+  else if(A.theme==="auto") root.removeAttribute("data-theme"); else root.setAttribute("data-theme", A.theme);
+  document.getElementById("timer").hidden = A.notimer;
+  document.querySelectorAll('#a11y input[name="fs"]').forEach(i=>i.checked = +i.value===A.fs);
+  document.querySelectorAll('#a11y input[name="theme"]').forEach(i=>{ i.checked = i.value===A.theme; i.disabled = A.hc; });
+  document.querySelectorAll('#a11y input[data-a]').forEach(i=>i.checked = !!A[i.dataset.a]);
+  if(!TTS){ const b=document.getElementById("ttsBox"); b.disabled=true; document.getElementById("ttsNote").textContent="La lecture à voix haute n’est pas disponible dans ce navigateur."; }
+}
+document.getElementById("a11yBtn").onclick = e=>{
+  const p=document.getElementById("a11y"), open=p.hidden; p.hidden=!open; e.currentTarget.setAttribute("aria-expanded", open);
+  if(open) p.querySelector("input").focus();
+};
+document.getElementById("a11y").addEventListener("change", e=>{
+  const t=e.target;
+  if(t.name==="fs") S.a11y.fs=+t.value;
+  else if(t.name==="theme") S.a11y.theme=t.value;
+  else if(t.dataset.a) S.a11y[t.dataset.a]=t.checked;
+  save(); applyA11y();
+  if(["tts","one"].includes(t.dataset.a)) render(false);
+});
+document.getElementById("a11y").addEventListener("keydown", e=>{ if(e.key==="Escape"){ document.getElementById("a11yBtn").click(); document.getElementById("a11yBtn").focus(); } });
+
+/* lecture à voix haute */
+let speakingBtn=null;
+document.addEventListener("click", e=>{
+  const b=e.target.closest(".say"); if(!b) return;
+  if(speakingBtn===b && speechSynthesis.speaking){ speechSynthesis.cancel(); b.classList.remove("on"); speakingBtn=null; return; }
+  speechSynthesis.cancel(); document.querySelectorAll(".say.on").forEach(x=>x.classList.remove("on"));
+  const u=new SpeechSynthesisUtterance(b.dataset.say.replace(/→/g," vers ").replace(/≈/g," environ ").replace(/…/g," ... "));
+  u.lang="fr-FR"; u.rate = S.a11y.slow ? .8 : 1;
+  const fr = speechSynthesis.getVoices().find(v=>v.lang && v.lang.startsWith("fr")); if(fr) u.voice=fr;
+  u.onend = ()=>{ b.classList.remove("on"); speakingBtn=null; };
+  b.classList.add("on"); speakingBtn=b; speechSynthesis.speak(u);
+});
+
+/* ---------- navigation ---------- */
+function renderPicker(){
+  const nav = document.getElementById("picker");
+  const item = (id,label,c) => `<button class="tab" data-id="${id}" style="--c:${c}" ${S.cur===id?'aria-current="page"':""}>${label}</button>`;
+  nav.innerHTML = item("home", `${ic("🏠")} Accueil`, "var(--ink)")
+    + MISSIONS.map(M=>item(M.id, `<span class="dot" aria-hidden="true"></span>${ic(M.icon)} ${esc(M.tab)}`, M.color)).join("")
+    + item("bilan", `${ic("📊")} Mise en commun`, "var(--ink)");
+  nav.querySelectorAll(".tab").forEach(b=>b.onclick=()=>go(b.dataset.id));
+}
+function go(id){ S.cur=id; save(); speechSynthesis?.cancel?.(); render(true); window.scrollTo({top:0}); }
+
+function render(moveFocus){
+  renderPicker();
+  if(S.cur==="home") renderHome();
+  else if(S.cur==="bilan") renderBilan();
+  else { const M=MISSIONS.find(m=>m.id===S.cur)||MISSIONS[0]; M.guided ? renderGuided(M) : renderMission(M); }
+  if(moveFocus){ const h=document.querySelector("#view h2"); if(h){ h.setAttribute("tabindex","-1"); h.focus({preventScroll:true}); } }
+}
+
+/* ---------- accueil : choix de la mission et du parcours ---------- */
+function renderHome(){
+  setColor(null);
+  const pickM = S.pickM || (S.cur!=="home"?S.cur:"") || "", pickL = S.level || 0;
+  let h = `<section class="home"><div class="card">
+    <h2>Bienvenue !</h2>
+    <p>Votre professeur vous indique votre mission et votre parcours. Choisissez-les ci-dessous, puis commencez. Le bouton « Affichage et lecture », en haut de la page, permet d’agrandir le texte, d’espacer les lettres ou d’écouter les consignes.</p>
+    <fieldset class="choice"><legend>1. Votre mission</legend><div class="options">
+    ${MISSIONS.map(M=>M.guided
+      ? `<div class="option disabled" style="--c:${M.color}">${ic(M.icon)}<span><b>${esc(M.tab.replace(" (en classe)",""))}</b><span class="d">Cette mission se fait avec toute la classe et le professeur.</span></span></div>`
+      : `<label class="option" style="--c:${M.color}"><input type="radio" name="mis" value="${M.id}" ${pickM===M.id?"checked":""}><span><b>${ic(M.icon)} ${esc(M.tab)}</b><span class="d">${esc(M.title)}</span></span></label>`).join("")}
+    </div></fieldset>
+    <fieldset class="choice"><legend>2. Votre parcours</legend><div class="options">
+    ${LEVELS.map(l=>`<label class="option"><input type="radio" name="lvl" value="${l.id}" ${pickL===l.id?"checked":""}><span><b>${l.name} · ${l.tag}</b><span class="d">${l.desc}</span></span></label>`).join("")}
+    </div></fieldset>
+    <div class="startbar"><button class="btn" id="startBtn">Commencer la mission</button><span class="msg" id="homeMsg" role="alert"></span></div>
+  </div></section>`;
+  const view=document.getElementById("view"); view.innerHTML=h;
+  document.getElementById("startBtn").onclick=()=>{
+    const m=view.querySelector('input[name="mis"]:checked'), l=view.querySelector('input[name="lvl"]:checked');
+    const msg=document.getElementById("homeMsg");
+    if(!m||!l){ msg.textContent = !m && !l ? "Choisissez une mission et un parcours." : !m ? "Choisissez une mission." : "Choisissez un parcours."; (m?view.querySelector('input[name="lvl"]'):view.querySelector('input[name="mis"]')).focus(); return; }
+    S.level=+l.value; S.pickM=m.value; go(m.value);
+  };
+}
+
+/* ---------- mission de recherche ---------- */
+function routeHTML(M){
+  const st = ms(M.id).steps;
+  let h = '<ol class="line" aria-label="Étapes du trajet">';
+  M.stops.forEach((s,i)=>{
+    h += `<li class="stop ${i===M.stops.length-1?'end':''}"><span class="pin" aria-hidden="true"></span><span class="nm">${esc(s)}</span></li>`;
+    if(i<M.stops.length-1){
+      const S2=M.steps[i]||{}, v=st[i]||{}, V=sview(S2);
+      const ok = ((+v.h||0)+(+v.m||0))>0 || v.n || V.given;
+      h += `<li class="seg ${ok?'ok':''}" aria-hidden="true"><span class="ico">${S2.mode||""}</span></li>`;
+    }
+  });
+  return h+"</ol>";
+}
+function progressText(M,T){ return `${T.done} étape${T.done>1?"s":""} complétée${T.done>1?"s":""} sur ${M.steps.length}. Le trait devient plein quand une étape est remplie.`; }
+
+function stepHTML(M,s,i,st){
+  const v = st.steps[i]||{}, V=sview(s), n=i+1;
+  const openHint = lvl()>=3 ? "open" : "";
+  return `<li class="step" id="step${i}">
+    <h3><span class="num" aria-hidden="true">${n}</span><span class="sr">Étape ${n} :</span> ${esc(M.stops[i])} <span aria-hidden="true">→</span><span class="sr"> vers </span> ${esc(M.stops[i+1])} <span class="md">${ic(s.mode)} ${esc(s.md)}</span></h3>
+    <p class="task">${esc(s.task)}${say(s.task,"la consigne de l’étape "+n)}</p>
+    <div class="links">${s.links.map(link).join("")}</div>
+    ${V.fixed.map(f=>`<div class="given"><span class="gbadge">${ic("🔒")} Donnée fournie</span><span class="glab">${esc(f.label)}</span>${f.info?"":`<b>${[f.m?fmt(f.m):"",f.p?eur(f.p):""].filter(Boolean).join(" · ")}</b>`}<small>Source : ${esc(f.src)}${f.info?"":" · déjà compté dans le total"}</small></div>`).join("")}
+    <div class="fields">
+      ${V.given?"":`<fieldset class="fld"><legend>Durée</legend><div class="dur">
+        <input type="number" min="0" inputmode="numeric" id="h${i}" data-s="${i}" data-k="h" value="${esc(v.h)}" aria-label="Étape ${n}, durée en heures"><span aria-hidden="true">h</span>
+        <input type="number" min="0" max="59" inputmode="numeric" data-s="${i}" data-k="m" value="${esc(v.m)}" aria-label="Étape ${n}, minutes"><span aria-hidden="true">min</span></div></fieldset>
+      <label for="p${i}">Prix (en €)<input type="number" id="p${i}" min="0" step="0.5" inputmode="decimal" data-s="${i}" data-k="p" value="${esc(v.p)}"></label>`}
+      <label class="wide" for="n${i}">Transport utilisé, distance, remarques<input type="text" id="n${i}" data-s="${i}" data-k="n" value="${esc(v.n)}"></label>
+    </div>
+    <details class="hint" ${openHint}><summary>Coup de pouce</summary><p>${esc(s.hint)}${say(s.hint,"le coup de pouce")}</p></details>
+  </li>`;
+}
+
+const MINC = 15;
+function corrHTML(id, c, val){
+  if(!c) return "";
+  const ok = (val||"").trim().length>=MINC;
+  return `<div class="corr" data-c="${id}">
+    <button class="btn alt cbtn" type="button" data-c="${id}" aria-expanded="false" aria-controls="ct${id}" ${ok?"":"disabled"} aria-describedby="cn${id}">Voir la correction</button>
+    <span class="cnote" id="cn${id}">${ok?"":"Écrivez d’abord votre réponse pour débloquer la correction."}</span>
+    <p class="ctext" id="ct${id}" hidden><strong>Correction : </strong>${esc(c)}${say(c,"la correction")}</p></div>`;
+}
+function compareHTML(M){
+  const T = totals(M);
+  const other = id => { const O=MISSIONS.find(m=>m.id===id), t=totals(O); return t.t>150? {d:fmt(t.t), p:t.p? eur(t.p):"?"} : null; };
+  const tr = other("train"), av = other("avion");
+  return `<div class="cmp"><div class="tablewrap"><table style="min-width:420px"><caption>Pour comparer</caption><thead><tr><th scope="col">Trajet</th><th scope="col">Durée</th><th scope="col">Prix aller simple</th></tr></thead><tbody>
+   <tr><th scope="row">${ic("🚌")} Votre trajet en bus</th><td>${fmt(T.t)}</td><td>${T.p? eur(T.p):"—"}</td></tr>
+   <tr><th scope="row">${ic("🚄")} Cadres en train</th><td>${tr?tr.d:"environ 9 h"}</td><td>${tr?tr.p:"150 à 350 €"}</td></tr>
+   <tr><th scope="row">${ic("✈️")} Touristes en avion</th><td>${av?av.d:"environ 7 h"}</td><td>${av?av.p:"110 à 200 €"}</td></tr>
+   </tbody></table></div>
+   <small>Repères moyens trouvés sur les sites. Demandez aussi ses résultats au groupe voisin.</small></div>`;
+}
+
+function renderMission(M){
+  setColor(M);
+  const st = ms(M.id), T = totals(M), one = S.a11y.one;
+  const cur = Math.min(S.focus[M.id]||0, M.steps.length-1);
+  let h = `<div class="mission-head">
+    <div class="mh-top"><div class="badges"><span class="role">${ic(M.icon)} ${esc(M.role)}</span><span class="lvl">${LV().name} · ${LV().tag}</span><button class="linkbtn" id="chg">Changer de mission ou de parcours</button></div>
+    <h2 id="mtitle">${esc(M.title)}</h2><p>${esc(M.intro)}${say(M.intro,"la présentation de la mission")}</p></div>
+    <div class="route" id="route">${routeHTML(M)}</div>
+    <p class="progress" id="prog" aria-live="polite">${progressText(M,T)}</p>
+  </div>`;
+  if(teacher) h += `<div class="teacher"><h3>Repères enseignant (ordres de grandeur, à vérifier le jour J)</h3><ul>${M.teacher.map(t=>`<li>${esc(t)}</li>`).join("")}</ul></div>`;
+  h += `<ol class="steps" aria-label="Étapes à compléter">`;
+  M.steps.forEach((s,i)=>{ if(!one || i===cur) h += stepHTML(M,s,i,st); });
+  h += `</ol>`;
+  if(one) h += `<div class="onenav"><button class="btn alt" id="prevStep" ${cur===0?"disabled":""}>Étape précédente</button><span>Étape ${cur+1} sur ${M.steps.length}</span><button class="btn" id="nextStep" ${cur===M.steps.length-1?"disabled":""}>Étape suivante</button></div>`;
+  h += `<div class="totals" aria-live="polite">
+    <div class="tot">Durée totale<b id="tt">${fmt(T.t)}</b></div>
+    <div class="tot">Prix total (aller simple)<b id="tp">${T.p? eur(T.p):"—"}</b></div>
+  </div>
+  <section class="qs" aria-labelledby="qsTitle"><h3 id="qsTitle">Réfléchir en géographe</h3>
+    ${M.questions.map((q,i)=>`<div class="q"><label for="q${i}">${esc(q.q)}</label>${say(q.q,"la question")}
+      ${lvl()>=2&&q.st?`<button type="button" class="starter" data-q="${i}" data-st="${esc(q.st)}">${ic("✏️")} Commencer ma phrase : « ${esc(q.st)} »</button>`:""}
+      <textarea id="q${i}" data-q="${i}">${esc(st.q[i])}</textarea>
+      ${q.hint?`<details class="hint" ${lvl()>=3?"open":""}><summary>Coup de pouce</summary><p>${esc(q.hint)}</p></details>`:""}
+      ${q.compare?compareHTML(M):""}
+      ${q.words?`<div class="words" role="group" aria-label="Mots utiles à ajouter">${q.words.map(w=>`<button type="button" class="word" data-q="${i}" data-w="${esc(w)}" aria-label="Ajouter « ${esc(w)} » à la réponse">+ ${esc(w)}</button>`).join("")}</div>`:""}
+      ${corrHTML(i, q.c, st.q[i])}
+    </div>`).join("")}
+    ${lvl()<3 && M.bonus ? `<div class="q bonus"><label for="qb">${ic("⭐")} Défi si vous avez fini : ${esc(M.bonus)}</label>${say(M.bonus,"le défi")}
+      ${M.bonusDoc?`<details class="doc"><summary>${ic("📄")} ${esc(M.bonusDoc.title)}</summary>${say(M.bonusDoc.paras.join(" "),"le document")}${M.bonusDoc.paras.map(p=>`<p>${esc(p)}</p>`).join("")}<p class="src">Sources : ${M.bonusDoc.src.map(s=>`<a href="${s.url}" target="_blank" rel="noopener">${esc(s.label)}<span class="sr"> (s’ouvre dans un nouvel onglet)</span></a>`).join(" ; ")}</p></details>`:""}
+      <textarea id="qb" data-q="b">${esc(st.q.b)}</textarea>
+      ${corrHTML("b", M.bonusC, st.q.b)}
+    </div>` : ""}
+  </section>
+  <div class="actions">
+    <button class="btn" id="copy">Copier notre fiche</button>
+    <button class="btn alt" id="toBilan">Voir la mise en commun</button>
+  </div>`;
+  const view = document.getElementById("view"); view.innerHTML = h;
+
+  document.getElementById("chg").onclick=()=>{ S.pickM=M.id; go("home"); };
+  view.querySelectorAll("input[data-s]").forEach(inp=>inp.oninput=()=>{
+    const i=inp.dataset.s; st.steps[i]=st.steps[i]||{}; st.steps[i][inp.dataset.k]=inp.value; save(); refresh(M);
+  });
+  view.querySelectorAll("textarea[data-q]").forEach(t=>t.addEventListener("input",()=>{ st.q[t.dataset.q]=t.value; save(); updCorr(view,t); }));
+  view.querySelectorAll(".word").forEach(b=>b.onclick=()=>{
+    const t=document.getElementById("q"+b.dataset.q); t.value=(t.value+(t.value&&!/\s$/.test(t.value)?" ":"")+b.dataset.w).trimStart(); t.dispatchEvent(new Event("input")); t.focus();
+  });
+  view.querySelectorAll(".starter").forEach(b=>b.onclick=()=>{
+    const t=document.getElementById("q"+b.dataset.q); if(!t.value.trim()) t.value=b.dataset.st+" "; t.dispatchEvent(new Event("input")); t.focus(); const k=t.value.indexOf("…"); if(k>-1) t.setSelectionRange(k,k+1);
+  });
+  view.querySelectorAll(".cbtn").forEach(b=>b.onclick=()=>{
+    const p=document.getElementById("ct"+b.dataset.c); p.hidden=!p.hidden; b.setAttribute("aria-expanded", !p.hidden); b.textContent=p.hidden?"Voir la correction":"Masquer la correction";
+  });
+  if(one){
+    const mv=d=>{ S.focus[M.id]=cur+d; save(); renderMission(M); document.querySelector(".step h3")?.setAttribute("tabindex","-1"); document.querySelector(".step h3")?.focus(); };
+    document.getElementById("prevStep").onclick=()=>mv(-1); document.getElementById("nextStep").onclick=()=>mv(1);
+  }
+  document.getElementById("copy").onclick=()=>copyFiche(M);
+  document.getElementById("toBilan").onclick=()=>go("bilan");
+}
+function updCorr(view,t){
+  const box = view.querySelector(`.corr[data-c="${t.dataset.q}"]`); if(!box) return;
+  const ok = t.value.trim().length>=MINC, b=box.querySelector(".cbtn");
+  if(b.disabled===!ok) return;
+  b.disabled=!ok; box.querySelector(".cnote").textContent = ok ? "" : "Écrivez d’abord votre réponse pour débloquer la correction.";
+  if(ok) toast("Correction disponible.");
+}
+function refresh(M){
+  const T=totals(M);
+  document.getElementById("tt").textContent=fmt(T.t);
+  document.getElementById("tp").textContent=T.p? eur(T.p):"—";
+  document.getElementById("route").innerHTML=routeHTML(M);
+  document.getElementById("prog").textContent=progressText(M,T);
+}
+
+function copyFiche(M){
+  const st=ms(M.id), T=totals(M);
+  let t=`${M.title} (${M.role}) – ${LV().name}\nDate de référence : ${document.getElementById("refdate").textContent}\n\n`;
+  M.steps.forEach((s,i)=>{ const v=st.steps[i]||{}, V=sview(s), d=(+v.h||0)*60+(+v.m||0);
+    t+=`${i+1}. ${M.stops[i]} → ${M.stops[i+1]} (${s.md}) : ${V.given?"":fmt(d)}${!V.given&&v.p?" · "+v.p+" €":""}${v.n?" · "+v.n:""}\n`;
+    V.fixed.filter(f=>!f.info).forEach(f=>{ t+=`   + donnée fournie, ${f.label} : ${[f.m?fmt(f.m):"",f.p?f.p+" €":""].filter(Boolean).join(" · ")}\n`; }); });
+  t+=`\nDurée totale : ${fmt(T.t)}\nPrix total : ${T.p? T.p+" €":"—"}\n\n`;
+  M.questions.forEach((q,i)=>{ t+=`${q.q}\n→ ${st.q[i]||"…"}\n\n`; });
+  if(st.q.b) t+=`Défi : ${M.bonus}\n→ ${st.q.b}\n`;
+  const done=()=>toast("Fiche copiée : collez-la dans votre document (Ctrl+V).");
+  if(navigator.clipboard?.writeText) navigator.clipboard.writeText(t).then(done,()=>fallbackCopy(t,done)); else fallbackCopy(t,done);
+}
+function fallbackCopy(t,cb){ const a=document.createElement("textarea"); a.value=t; document.body.appendChild(a); a.select(); try{document.execCommand("copy"); cb();}catch(e){ toast("Copie impossible : sélectionnez le texte à la main."); } a.remove(); }
+function toast(msg){ const e=document.getElementById("toast"); e.textContent=msg; e.classList.add("show"); clearTimeout(e._t); e._t=setTimeout(()=>e.classList.remove("show"),3500); }
+
+/* ---------- séance guidée (navire) ---------- */
+function renderGuided(M){
+  setColor(M);
+  S.guide = Math.min(Math.max(S.guide||0,0), M.slides.length-1);
+  const k = S.guide, sl = M.slides[k];
+  let line='<ol class="line compact" aria-label="Trajet du conteneur">';
+  M.stops.forEach((st,i)=>{
+    const vis = i<=sl.upto;
+    line += `<li class="stop ${i===M.stops.length-1?'end':''} ${vis?'':'off'}"><span class="pin" aria-hidden="true"></span><span class="nm">${vis?esc(st):'<span aria-hidden="true">?</span><span class="sr">étape cachée</span>'}</span></li>`;
+    if(i<M.stops.length-1) line += `<li class="seg ${i<sl.upto?'ok':'off'}" aria-hidden="true"><span class="ico">${i<sl.upto?(i===M.stops.length-2?"🚚":"🚢"):""}</span></li>`;
+  });
+  line+='</ol>';
+  let body;
+  if(sl.trace){
+    let n=0;
+    const txt = esc(sl.text).replace(/\[([^\]]+)\]/g,(m,w)=>`<span class="drop" data-i="${n}" data-a="${w}" role="button" tabindex="0" aria-label="Trou ${++n}, vide"></span>`);
+    body = `<p class="sr" id="dndHelp">Pour remplir un trou : choisissez une étiquette avec Entrée, puis choisissez un trou avec Entrée. On peut aussi glisser les étiquettes à la souris ou au doigt.</p>
+      <p class="tracetxt" aria-describedby="dndHelp">${txt}</p>${say(sl.text.replace(/\[[^\]]+\]/g,"blanc"),"le texte à trous")}
+      <ul class="bank" id="bank" aria-label="Étiquettes à placer"></ul>
+      <p class="tstat" id="tstat" role="status"></p>
+      <div class="actions" style="margin:12px 0 0"><button class="btn" id="chkT">Vérifier</button><button class="btn alt" id="rstT">Recommencer</button><button class="btn alt" id="allB">Tout révéler</button></div>`;
+  } else {
+    body = `<p class="gq">${esc(sl.q)}${say(sl.q,"la question")}</p>
+      <button class="btn" id="showA" aria-expanded="false" aria-controls="ga">Afficher la réponse</button>
+      <p class="ga" id="ga" hidden>${esc(sl.a)}${say(sl.a,"la réponse")}</p>`;
+  }
+  let h = `<div class="mission-head">
+    <div class="mh-top"><div class="badges"><span class="role">${ic(M.icon)} ${esc(M.role)}</span></div><h2>${esc(M.title)}</h2><p>${esc(M.intro)}</p></div>
+    <div class="route">${line}</div></div>
+  ${teacher?`<div class="teacher"><h3>Repères enseignant</h3><ul>${M.teacher.map(t=>`<li>${esc(t)}</li>`).join("")}</ul></div>`:""}
+  <section class="slide" aria-labelledby="slTitle">
+    <p class="snum" style="margin:0">Étape ${k+1} sur ${M.slides.length}</p>
+    <h3 id="slTitle">${esc(sl.title)}</h3>
+    <p class="screen">${ic("🖥️")} <span class="sr">À l’écran : </span>${esc(sl.screen)}</p>
+    ${sl.links&&sl.links.length?`<div class="links">${sl.links.map(link).join("")}</div>`:""}
+    ${body}
+  </section>
+  <nav class="snav" aria-label="Étapes de la séance">
+    <button class="btn alt" id="prevS" ${k===0?"disabled":""}>Étape précédente</button>
+    <span class="dots">${M.slides.map((_,i)=>`<button class="sdot" data-k="${i}" ${i===k?'aria-current="step"':""} aria-label="Étape ${i+1} : ${esc(M.slides[i].title)}"></button>`).join("")}</span>
+    <button class="btn" id="nextS" ${k===M.slides.length-1?"disabled":""}>Étape suivante</button>
+  </nav>`;
+  const view=document.getElementById("view"); view.innerHTML=h;
+  const goS = (x,focusTitle=true) => { S.guide=x; save(); speechSynthesis?.cancel?.(); renderGuided(M); if(focusTitle){ const t=document.getElementById("slTitle"); t.setAttribute("tabindex","-1"); t.focus(); } };
+  document.getElementById("prevS").onclick=()=>goS(k-1);
+  document.getElementById("nextS").onclick=()=>goS(k+1);
+  view.querySelectorAll(".sdot").forEach(b=>b.onclick=()=>goS(+b.dataset.k));
+  const sa=document.getElementById("showA"); if(sa) sa.onclick=()=>{ const a=document.getElementById("ga"); a.hidden=!a.hidden; sa.setAttribute("aria-expanded",!a.hidden); sa.textContent=a.hidden?"Afficher la réponse":"Masquer la réponse"; };
+  if(sl.trace) setupDnD(view, sl);
+}
+document.addEventListener("keydown",e=>{
+  if(S.cur!=="navire" || /INPUT|TEXTAREA|BUTTON/.test(document.activeElement.tagName) || document.activeElement.classList.contains("drop")) return;
+  const M=MISSIONS.find(m=>m.id==="navire");
+  if(e.key==="ArrowRight" && S.guide<M.slides.length-1){ S.guide++; save(); renderGuided(M); }
+  if(e.key==="ArrowLeft" && S.guide>0){ S.guide--; save(); renderGuided(M); }
+});
+
+/* glisser-déposer : souris, doigt ou clavier */
+function setupDnD(view, sl){
+  const drops=[...view.querySelectorAll(".drop")], bank=view.querySelector("#bank"), stat=view.querySelector("#tstat");
+  const words=[...drops.map(d=>d.dataset.a), ...(sl.distract||[])];
+  let order = words.map((w,i)=>i).sort(()=>Math.random()-.5);
+  let placed = drops.map(()=>null), sel=null;
+  const selChip = w => { sel = sel===w ? null : w; bank.querySelectorAll(".chip").forEach(c=>c.setAttribute("aria-pressed", +c.dataset.w===sel)); stat.textContent = sel===null ? "" : `« ${words[sel]} » est choisie. Choisissez maintenant un trou.`; };
+  const draw=(focusBank)=>{
+    const free = order.filter(i=>!placed.includes(i));
+    bank.innerHTML = free.map(i=>`<li><span class="chip" data-w="${i}" tabindex="0" role="button" aria-pressed="false">${esc(words[i])}</span></li>`).join("") || `<li>Toutes les étiquettes sont placées.</li>`;
+    drops.forEach((d,k)=>{ const w=placed[k]; d.textContent = w===null ? "" : words[w]; d.classList.toggle("full", w!==null); d.classList.remove("ok","ko");
+      if(w!==null){ d.dataset.w=w; d.setAttribute("aria-label",`Trou ${k+1} : ${words[w]}. Entrée pour retirer l’étiquette.`); } else { delete d.dataset.w; d.setAttribute("aria-label",`Trou ${k+1}, vide`); } });
+    bank.querySelectorAll(".chip").forEach(c=>bindChip(c,false));
+    drops.forEach(d=>{ if(d.dataset.w!==undefined) bindChip(d,true); else d.onpointerdown=null; });
+    if(focusBank) (bank.querySelector(".chip")||view.querySelector("#chkT")).focus();
+  };
+  const place=(w,k)=>{ const prev=placed.indexOf(w); if(prev>-1) placed[prev]=null; placed[k]=w; sel=null; draw(false); stat.textContent=`« ${words[w]} » placé dans le trou ${k+1}.`; drops[k].focus(); };
+  const unplace=k=>{ const w=placed[k]; placed[k]=null; draw(false); stat.textContent=`« ${words[w]} » est revenue dans les étiquettes.`; drops[k].focus(); };
+  function bindChip(el, inDrop){
+    el.onpointerdown = e=>{
+      if(e.button>0) return; e.preventDefault();
+      const w=+el.dataset.w, x0=e.clientX, y0=e.clientY; let ghost=null;
+      const move=ev=>{
+        if(!ghost && Math.hypot(ev.clientX-x0, ev.clientY-y0)>6){ ghost=document.createElement("span"); ghost.className="chip ghost"; ghost.textContent=words[w]; document.body.appendChild(ghost); }
+        if(ghost){ ghost.style.left=ev.clientX+"px"; ghost.style.top=ev.clientY+"px"; drops.forEach(d=>d.classList.remove("hover")); document.elementFromPoint(ev.clientX,ev.clientY)?.closest(".drop")?.classList.add("hover"); }
+      };
+      const up=ev=>{
+        window.removeEventListener("pointermove",move); window.removeEventListener("pointerup",up);
+        drops.forEach(d=>d.classList.remove("hover"));
+        if(ghost){ ghost.remove(); const d=document.elementFromPoint(ev.clientX,ev.clientY)?.closest(".drop");
+          if(d) place(w,+d.dataset.i); else if(inDrop) unplace(+el.dataset.i);
+        } else if(inDrop){ if(sel!==null) place(sel,+el.dataset.i); else unplace(+el.dataset.i); }
+        else selChip(w);
+      };
+      window.addEventListener("pointermove",move); window.addEventListener("pointerup",up);
+    };
+    el.onkeydown = e=>{ if(e.key==="Enter"||e.key===" "){ e.preventDefault();
+      if(inDrop){ if(sel!==null) place(sel,+el.dataset.i); else unplace(+el.dataset.i); } else { selChip(+el.dataset.w); if(sel!==null) drops.find((d,k)=>placed[k]===null)?.focus(); } } };
+  }
+  drops.forEach(d=>{
+    d.addEventListener("click",()=>{ if(d.dataset.w===undefined && sel!==null) place(sel,+d.dataset.i); });
+    d.addEventListener("keydown",e=>{ if((e.key==="Enter"||e.key===" ") && d.dataset.w===undefined){ e.preventDefault(); if(sel!==null) place(sel,+d.dataset.i); else { stat.textContent="Choisissez d’abord une étiquette."; bank.querySelector(".chip")?.focus(); } } });
+  });
+  view.querySelector("#chkT").onclick=()=>{
+    let ok=0;
+    drops.forEach((d,k)=>{ d.classList.remove("ok","ko"); if(placed[k]===null) return; const good = words[placed[k]]===d.dataset.a; d.classList.add(good?"ok":"ko"); d.setAttribute("aria-label",`Trou ${k+1} : ${words[placed[k]]}, ${good?"correct":"incorrect"}`); if(good) ok++; });
+    const filled=placed.filter(x=>x!==null).length;
+    stat.textContent = `${ok} bonne${ok>1?"s":""} réponse${ok>1?"s":""} sur ${drops.length}.` + (filled<drops.length?` Il reste ${drops.length-filled} trou${drops.length-filled>1?"s":""} à remplir.`: ok<drops.length?" Les étiquettes marquées ✗ sont à déplacer.":" Bravo, la trace écrite est complète !");
+  };
+  view.querySelector("#rstT").onclick=()=>{ placed=drops.map(()=>null); sel=null; order.sort(()=>Math.random()-.5); draw(true); stat.textContent="Tout est à refaire."; };
+  view.querySelector("#allB").onclick=()=>{ placed=drops.map(d=>words.indexOf(d.dataset.a)); draw(false); drops.forEach((d,k)=>{ d.classList.add("ok"); }); stat.textContent="Toutes les réponses sont affichées."; };
+  draw(false);
+}
+
+/* ---------- mise en commun ---------- */
+function renderBilan(){
+  setColor(null);
+  let h=`<div class="mission-head"><div class="mh-top"><div class="badges"><span class="role" style="background:var(--ink);color:var(--paper)">${ic("📊")} Toute la classe</span></div><h2>Mise en commun</h2>
+  <p>Chaque groupe présente son trajet. Complétez le tableau : les durées et les prix se comparent automatiquement. Les lignes camion et navire sont pré-remplies avec des ordres de grandeur, à corriger avec les résultats des élèves.</p></div><div style="height:16px"></div></div>
+  <div class="tablewrap"><table><caption class="sr">Résultats des missions</caption><thead><tr><th scope="col">Mission</th><th scope="col">Transports</th><th scope="col">Durée (h)</th><th scope="col">Prix (€)</th><th scope="col">Un atout de Londres montré</th></tr></thead><tbody>`;
+  MISSIONS.forEach(M=>{
+    const b=S.bilan[M.id]||{}, T=totals(M);
+    const autoH = T.t>150 ? (Math.round(T.t/6)/10) : "";
+    const nm=M.tab.replace(" (en classe)","");
+    h+=`<tr><th scope="row"><span class="mname" style="--c:${M.color};--cl:${M.light}">${ic(M.icon)} ${esc(nm)}</span></th>
+    <td><input type="text" data-b="${M.id}" data-k="modes" aria-label="${esc(nm)} : transports" value="${esc(b.modes??(M.modes||M.steps.map(s=>s.md).join(", ")))}"></td>
+    <td><input type="number" min="0" step="0.5" data-b="${M.id}" data-k="h" aria-label="${esc(nm)} : durée en heures" value="${esc(b.h??(autoH||(M.ref?M.ref.h:"")))}"></td>
+    <td><input type="number" min="0" data-b="${M.id}" data-k="p" aria-label="${esc(nm)} : prix en euros${M.ref?", "+M.ref.unit:""}" value="${esc(b.p??((T.t>150&&T.p)||(M.ref?M.ref.p:"")))}">${M.ref?`<small class="unit">${M.ref.unit}</small>`:""}</td>
+    <td><input type="text" data-b="${M.id}" data-k="a" aria-label="${esc(nm)} : atout de Londres" value="${esc(b.a)}"></td></tr>`;
+  });
+  h+=`</tbody></table></div>
+  <section class="bars" aria-labelledby="b1"><h3 id="b1" class="disp" style="font-size:1.2rem;margin-bottom:6px">Combien de temps pour rejoindre Londres ?</h3><div id="bars"></div></section>
+  <section class="bars" aria-labelledby="b2"><h3 id="b2" class="disp" style="font-size:1.2rem;margin-bottom:6px">Combien coûte le voyage ?</h3><p class="cnote" style="margin:0 0 6px">Attention : on ne compare pas la même chose. Les voyageurs paient pour une personne, les marchandises pour tout un camion ou un conteneur.</p><div id="pbars"></div></section>
+  <section class="qs" style="margin-top:14px" aria-labelledby="cc"><h3 id="cc">Conclusion de la classe</h3>
+    <div class="q"><label for="concl">Londres est connectée au monde grâce à…</label><textarea id="concl">${esc(S.concl)}</textarea>
+    <div class="words" role="group" aria-label="Mots utiles à ajouter">${["aéroports internationaux","tunnel sous la Manche","Eurostar","ports","conteneurs","flux de personnes","flux de marchandises","métropole mondiale","interface"].map(w=>`<button type="button" class="word" data-w="${w}" aria-label="Ajouter « ${w} »">+ ${w}</button>`).join("")}</div></div>
+  </section>`;
+  if(teacher) h+=`<div class="teacher"><h3>Repères enseignant</h3><ul><li>Avion ~7 h · Train ~9 h · Bus ~22 h · Camion 1,5 à 2 jours · Navire 5 à 7 jours.</li><li>Prix : ~2 800 € pour un camion de pélardons, ~2 000 € pour un conteneur de 10 000 pièces, soit quelques centimes par objet transporté.</li><li>Idée à faire émerger : plus le trajet est rapide, plus il est cher ; Londres est reliée par tous les modes de transport, pour les personnes comme pour les marchandises.</li></ul></div>`;
+  h+=`<div class="actions" style="margin-top:14px"><button class="btn alt" id="clrB">Remettre le tableau à zéro</button></div>`;
+  const view=document.getElementById("view"); view.innerHTML=h;
+  view.querySelectorAll("input[data-b]").forEach(inp=>inp.oninput=()=>{ const id=inp.dataset.b; S.bilan[id]=S.bilan[id]||{}; S.bilan[id][inp.dataset.k]=inp.value; save(); drawBars(); });
+  const c=document.getElementById("concl"); c.oninput=()=>{ S.concl=c.value; save(); };
+  view.querySelectorAll(".word").forEach(b=>b.onclick=()=>{ c.value=(c.value+(c.value&&!/\s$/.test(c.value)?", ":"")+b.dataset.w).trimStart(); S.concl=c.value; save(); c.focus(); });
+  document.getElementById("clrB").onclick=()=>{ S.bilan={}; save(); renderBilan(); toast("Tableau remis à zéro."); };
+  drawBars();
+}
+function drawBars(){
+  const get = k => MISSIONS.map(M=>{ const inp=document.querySelector(`input[data-b="${M.id}"][data-k="${k}"]`); return {M, v:parseFloat(String(inp?.value).replace(",","."))||0}; });
+  const bars = (vals, f, note) => { const max=Math.max(1,...vals.map(x=>x.v));
+    return `<ul style="list-style:none;padding:0;margin:0">`+vals.map(({M,v})=>`<li class="bar" style="--c:${M.color}"><span class="n">${ic(M.icon)} ${esc(M.tab.replace(" (en classe)",""))}</span><div class="track" aria-hidden="true"><div class="fill" style="width:${v/max*100}%"></div></div><span class="v">${v? f(v,M) : "non renseigné"}</span></li>`).join("")+`</ul>`+(note||""); };
+  document.getElementById("bars").innerHTML = bars(get("h"), v=>fmt(Math.round(v*60)));
+  document.getElementById("pbars").innerHTML = bars(get("p"), (v,M)=>eur(v)+(M.ref?" *":""), `<p class="cnote" style="margin:6px 0 0">* par camion ou par conteneur</p>`);
+}
+
+/* ---------- minuteur ---------- */
+let left=30*60, run=false, iv=null;
+const tval=document.getElementById("tval"), tgo=document.getElementById("tgo");
+const showT=()=>{ tval.textContent=`${String(Math.floor(left/60)).padStart(2,"0")}:${String(left%60).padStart(2,"0")}`; tval.setAttribute("aria-label", `${Math.floor(left/60)} minutes ${left%60} secondes restantes`); document.getElementById("timer").classList.toggle("done",left===0); };
+tgo.onclick=()=>{ if(left===0) return; run=!run; tgo.textContent=run?"Pause":"Reprendre";
+  if(run){ iv=setInterval(()=>{ if(left>0){ left--; showT(); if(left===300) toast("Plus que 5 minutes."); if(left===0){ clearInterval(iv); run=false; tgo.textContent="Terminé"; toast("Temps écoulé : préparez votre présentation !"); } } },1000); } else clearInterval(iv); };
+document.getElementById("tplus").onclick=()=>{ left+=300; if(tgo.textContent==="Terminé") tgo.textContent="Reprendre"; showT(); toast("5 minutes ajoutées."); };
+document.getElementById("treset").onclick=()=>{ clearInterval(iv); run=false; left=30*60; tgo.textContent="Démarrer"; showT(); };
+
+(function(){
+  const b=document.getElementById("resetAll"); let armed=false, tm=null;
+  b.onclick=()=>{
+    if(!armed){ armed=true; b.textContent="Cliquez encore pour confirmer"; b.classList.add("danger"); tm=setTimeout(()=>{ armed=false; b.textContent="Effacer mes réponses"; b.classList.remove("danger"); },5000); return; }
+    clearTimeout(tm); armed=false; b.textContent="Effacer mes réponses"; b.classList.remove("danger");
+    S={cur:S.cur,m:{},bilan:{},ref:S.ref,guide:0,concl:"",level:S.level,focus:{},a11y:S.a11y,pickM:S.pickM}; save(); render(false); toast("Réponses effacées.");
+  };
+})();
+document.getElementById("tcode").oninput=e=>{ const on=e.target.value.trim().toLowerCase()==="prof"; if(on!==teacher){ teacher=on; render(false); } };
+
+applyA11y(); showT(); render(false);
+</script>
+</body>
+</html>
