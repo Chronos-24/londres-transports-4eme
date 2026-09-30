@@ -230,6 +230,11 @@ td input{ min-width:90px; }
 .dl{ background:var(--paper); border:2px solid var(--ink); border-radius:14px; padding:18px 20px; margin:0 0 30px; }
 .dl h3{ font-size:1.25rem; margin-bottom:6px; }
 .dl ul{ margin:6px 0 12px; }
+.panneau{ margin-top:12px; padding:12px 16px; border:2px dashed var(--line); border-radius:12px; background:var(--soft); }
+.panneau.alerte{ border-color:var(--ko); }
+.filebtn{ display:inline-flex; align-items:center; }
+.filebtn input{ position:absolute; opacity:0; width:1px; height:1px; }
+.filebtn:focus-within{ outline:3px solid var(--mt); outline-offset:3px; }
 .snav{ display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap; margin-top:14px; }
 .dots{ display:flex; gap:4px; }
 .sdot{ width:36px; height:36px; border:0; background:none; padding:0; cursor:pointer; display:grid; place-items:center; }
@@ -596,8 +601,15 @@ function renderHome(){
     <fieldset class="choice"><legend>2. Votre parcours</legend><div class="options">
     ${LEVELS.map(l=>`<label class="option"><input type="radio" name="lvl" value="${l.id}" ${pickL===l.id?"checked":""}><span><b>${l.name} · ${l.tag}</b><span class="d">${l.desc}</span></span></label>`).join("")}
     </div></fieldset>
+    <div class="choice"><label for="eleveH" style="font-family:Overpass,sans-serif;font-weight:800;font-size:1.25rem;display:block;margin-bottom:8px">3. Vos noms et votre classe</label>
+      <input type="text" id="eleveH" class="eleve" autocomplete="off" placeholder="Exemple : Léa Martin, Tom Petit – 4eB" value="${esc(S.eleve)}" style="max-width:520px"></div>
     <div class="startbar"><button class="btn" id="startBtn">Commencer la mission</button><span class="msg" id="homeMsg" role="alert"></span></div>
+  </div>
+  <div class="card"><h2 style="font-size:1.4rem">${ic("📂")} Vous reprenez un travail commencé ?</h2>
+    <p>Si vous avez téléchargé une sauvegarde lors d’une séance précédente, rechargez-la ici, même sur un autre ordinateur.</p>
+    ${saveUI("h")}
   </div></section>`;
+  
   const view=document.getElementById("view"); view.innerHTML=h;
   document.getElementById("startBtn").onclick=()=>{
     const m=view.querySelector('input[name="mis"]:checked'), l=view.querySelector('input[name="lvl"]:checked');
@@ -605,6 +617,7 @@ function renderHome(){
     if(!m||!l){ msg.textContent = !m && !l ? "Choisissez une mission et un parcours." : !m ? "Choisissez une mission." : "Choisissez un parcours."; (m?view.querySelector('input[name="lvl"]'):view.querySelector('input[name="mis"]')).focus(); return; }
     S.level=+l.value; S.pickM=m.value; go(m.value);
   };
+  bindEleve(view); bindSave(view,"h");
 }
 
 /* ---------- mission de recherche ---------- */
@@ -697,21 +710,45 @@ function renderMission(M){
       ${corrHTML("b", M.bonusC, st.q.b)}
     </div>` : ""}
   </section>
-  <div class="actions">
-    <button class="btn" id="copy">Copier notre fiche</button>
-    <button class="btn alt" id="toBilan">Voir la mise en commun</button>
-  </div>
-  <section class="dl" aria-labelledby="dlT"><h3 id="dlT">${ic("📥")} Correction complète</h3><div id="dlMsg" aria-live="polite"></div>
-    <button class="btn" id="dlBtn">Télécharger la correction</button></section>`;
+  <section class="dl" aria-labelledby="rendT"><h3 id="rendT">${ic("📤")} Rendre notre travail</h3>
+    <label for="eleveM">Vos noms et votre classe</label>
+    <input type="text" id="eleveM" class="eleve" autocomplete="off" placeholder="Exemple : Léa Martin, Tom Petit – 4eB" value="${esc(S.eleve)}" style="max-width:520px;margin:4px 0 12px">
+    <div class="actions" style="margin:0">
+      <button class="btn" id="telecharger" aria-expanded="false" aria-controls="choixFormat">Télécharger nos réponses</button>
+      <button class="btn alt" id="copy">Copier notre fiche</button>
+      <button class="btn alt" id="toBilan">Voir la mise en commun</button>
+    </div>
+    <div class="panneau" id="choixFormat" hidden>
+      <p><b>Dans quel format ?</b></p>
+      <div class="actions" style="margin:0">
+        <button class="btn" id="dlDocx">${ic("📄")} Document Word (.docx)</button>
+        <button class="btn" id="dlPdf">${ic("📑")} PDF</button>
+        <button class="btn alt" id="dlAnnuler">Annuler</button>
+      </div>
+      <p class="cnote">Pour le PDF, une fenêtre d’impression s’ouvre : choisissez « Enregistrer au format PDF » comme imprimante, puis cliquez sur « Enregistrer ».</p>
+    </div>
+    <p class="cnote" id="fbFin" role="status"></p>
+  </section>
+  <section class="dl" aria-labelledby="svT"><h3 id="svT">${ic("💾")} Pas fini ? Sauvegardez votre travail</h3>
+    <p>Téléchargez une sauvegarde à la fin de la séance, puis rechargez-la la prochaine fois pour reprendre là où vous en étiez, même sur un autre ordinateur.</p>
+    ${saveUI("m")}
+  </section>
+`;
   const view = document.getElementById("view"); view.innerHTML = h;
-  updDl(M);
-  document.getElementById("dlBtn").onclick=()=>downloadCorrection(M);
+  bindEleve(view); bindSave(view,"m");
+  const tb=document.getElementById("telecharger"), cf=document.getElementById("choixFormat"), fb=document.getElementById("fbFin");
+  tb.onclick=()=>{ cf.hidden=!cf.hidden; tb.setAttribute("aria-expanded",!cf.hidden); if(!cf.hidden) document.getElementById("dlDocx").focus(); };
+  document.getElementById("dlAnnuler").onclick=()=>{ cf.hidden=true; tb.setAttribute("aria-expanded","false"); tb.focus(); };
+  document.getElementById("dlDocx").onclick=()=>{
+    try{ dlBlob(makeDocx(M), `londres-${M.id}-${slug()}.docx`); fb.textContent="Fichier Word téléchargé : déposez-le dans le devoir Éléa."; }
+    catch(e){ fb.textContent="Le téléchargement n’a pas marché : utilisez plutôt « Copier notre fiche »."; } };
+  document.getElementById("dlPdf").onclick=()=>{ printRecap(M); fb.textContent="Dans la fenêtre d’impression, choisissez « Enregistrer au format PDF »."; };
 
   document.getElementById("chg").onclick=()=>{ S.pickM=M.id; go("home"); };
   view.querySelectorAll("input[data-s]").forEach(inp=>inp.oninput=()=>{
     const i=inp.dataset.s; st.steps[i]=st.steps[i]||{}; st.steps[i][inp.dataset.k]=inp.value; save(); refresh(M);
   });
-  view.querySelectorAll("textarea[data-q]").forEach(t=>t.addEventListener("input",()=>{ st.q[t.dataset.q]=t.value; save(); updCorr(view,t); updDl(M); }));
+  view.querySelectorAll("textarea[data-q]").forEach(t=>t.addEventListener("input",()=>{ st.q[t.dataset.q]=t.value; save(); updCorr(view,t); }));
   view.querySelectorAll(".word").forEach(b=>b.onclick=()=>{
     const t=document.getElementById("q"+b.dataset.q); t.value=(t.value+(t.value&&!/\s$/.test(t.value)?" ":"")+b.dataset.w).trimStart(); t.dispatchEvent(new Event("input")); t.focus();
   });
@@ -741,7 +778,6 @@ function refresh(M){
   document.getElementById("tp").textContent=T.p? eur(T.p):"—";
   document.getElementById("route").innerHTML=routeHTML(M);
   document.getElementById("prog").textContent=progressText(M,T);
-  updDl(M);
 }
 
 function copyFiche(M){
@@ -871,6 +907,128 @@ function setupDnD(view, sl){
 }
 
 
+
+/* ---------- noms, sauvegarde, reprise, export Word / PDF ---------- */
+const ACT = "londres-4e";
+const slug = () => (S.eleve||"groupe").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"").slice(0,50) || "groupe";
+function bindEleve(view){
+  view.querySelectorAll(".eleve").forEach(i=>i.oninput=()=>{ S.eleve=i.value; save(); });
+}
+function dlBlob(blob, name){
+  const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download=name;
+  document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(a.href),60000);
+}
+function saveUI(k){
+  return `<div class="actions" style="margin:0">
+      <button class="btn" id="sv${k}">${ic("💾")} Télécharger ma sauvegarde</button>
+      <label class="btn alt filebtn">${ic("📂")} Reprendre un travail sauvegardé<input type="file" id="ld${k}" accept=".json,application/json"></label>
+    </div>
+    <div class="panneau alerte" id="cf${k}" hidden role="alertdialog" aria-labelledby="ci${k}">
+      <p id="ci${k}"></p>
+      <p>Votre travail actuel sur cet ordinateur sera remplacé. Continuer ?</p>
+      <div class="actions" style="margin:0"><button class="btn" id="ok${k}">Oui, reprendre</button><button class="btn alt" id="no${k}">Annuler</button></div>
+    </div>
+    <p class="cnote" id="fs${k}" role="status"></p>`;
+}
+function bindSave(view,k){
+  const fb=document.getElementById("fs"+k), cf=document.getElementById("cf"+k); let pending=null;
+  document.getElementById("sv"+k).onclick=()=>{
+    const {cur, a11y, ...etat} = S;
+    const data={activite:ACT, version:1, eleve:S.eleve||"", date:new Date().toISOString(), etat};
+    try{ dlBlob(new Blob([JSON.stringify(data)],{type:"application/json"}), `sauvegarde-londres-${slug()}.json`);
+      fb.textContent="Sauvegarde téléchargée. Rangez ce fichier : vous en aurez besoin pour reprendre votre travail."; }
+    catch(e){ fb.textContent="La sauvegarde n’a pas pu être téléchargée."; }
+  };
+  document.getElementById("ld"+k).onchange=e=>{
+    const f=e.target.files[0]; if(!f) return;
+    const r=new FileReader();
+    r.onload=()=>{
+      try{
+        const d=JSON.parse(r.result);
+        if(!d || d.activite!==ACT || typeof d.etat!=="object") throw 0;
+        pending=d.etat;
+        const quand=d.date? new Date(d.date).toLocaleString("fr-FR",{dateStyle:"short",timeStyle:"short"}):"";
+        const Mi=MISSIONS.find(m=>m.id===d.etat.pickM), Li=LEVELS.find(l=>l.id===d.etat.level);
+        document.getElementById("ci"+k).innerHTML=`<b>Sauvegarde trouvée</b>${d.eleve?" de "+esc(d.eleve):""}${quand?", du "+esc(quand):""}${Mi?` · ${esc(Mi.tab)}`:""}${Li?` · ${Li.name}`:""}.`;
+        cf.hidden=false; document.getElementById("ok"+k).focus(); fb.textContent="";
+      }catch(err){ fb.textContent="Ce fichier n’est pas une sauvegarde de cette activité. Choisissez le fichier « sauvegarde-londres-… .json »."; }
+      e.target.value="";
+    };
+    r.readAsText(f);
+  };
+  document.getElementById("no"+k).onclick=()=>{ pending=null; cf.hidden=true; fb.textContent="Reprise annulée."; };
+  document.getElementById("ok"+k).onclick=()=>{
+    if(!pending) return;
+    S = Object.assign({m:{},bilan:{},focus:{}}, pending, {a11y:S.a11y});
+    S.cur = S.level && S.pickM ? S.pickM : "home";
+    save(); render(true); toast("Travail repris : vous pouvez continuer là où vous en étiez.");
+  };
+}
+
+/* récapitulatif commun (Word, PDF) */
+function recapBlocks(M){
+  const st=ms(M.id), T=totals(M), B=[];
+  B.push({t:"titre", x:"Londres, connectée au monde – Géographie 4e"});
+  B.push({t:"id", x:`${S.eleve||"Noms non renseignés"} · ${M.tab} · ${LV().name} (${LV().tag}) · ${new Date().toLocaleDateString("fr-FR")}`});
+  B.push({t:"h", x:`${M.title} (${M.role})`});
+  B.push({t:"p", x:`Date de référence des recherches : ${document.getElementById("refdate").textContent}`});
+  B.push({t:"h", x:"Notre trajet"});
+  M.steps.forEach((s,i)=>{ const v=st.steps[i]||{}, V=sview(s), d=(+v.h||0)*60+(+v.m||0);
+    const val = V.given ? "données fournies" : [fmt(d), v.p? v.p+" €":""].filter(Boolean).join(" · ");
+    B.push({t:"q", l:`Étape ${i+1} : ${M.stops[i]} → ${M.stops[i+1]} (${s.md})`, x:val+(v.n?" · "+v.n:"")});
+    V.fixed.filter(f=>!f.info).forEach(f=>B.push({t:"p", x:`   + donnée fournie, ${f.label} : ${[f.m?fmt(f.m):"",f.p?eur(f.p):""].filter(Boolean).join(" · ")}`}));
+  });
+  B.push({t:"q", l:"Durée totale", x:fmt(T.t)});
+  B.push({t:"q", l:"Prix total (aller simple)", x:T.p? eur(T.p):"—"});
+  B.push({t:"h", x:"Réfléchir en géographe"});
+  M.questions.forEach((q,i)=>{ B.push({t:"q", l:q.q, x:st.q[i]||"(pas de réponse)"}); });
+  if(st.q.b && M.bonus) B.push({t:"q", l:"Défi : "+M.bonus, x:st.q.b});
+  return B;
+}
+function printRecap(M){
+  const body = recapBlocks(M).map(k=> k.t==="titre"?`<h1>${esc(k.x)}</h1>` : k.t==="id"?`<p class="id">${esc(k.x)}</p>` : k.t==="h"?`<h2>${esc(k.x)}</h2>` : k.t==="q"?`<p><b>${esc(k.l)} :</b> ${esc(k.x).replace(/\n/g,"<br>")}</p>` : `<p>${esc(k.x)}</p>`).join("");
+  const html=`<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8"><title>Londres – ${esc(S.eleve||"groupe")}</title><style>body{font-family:Arial,sans-serif;font-size:12pt;line-height:1.5;color:#000;margin:0}h1{font-size:18pt;color:${M.color};margin:0 0 6pt}h2{font-size:14pt;color:${M.color};margin:16pt 0 6pt;border-bottom:1pt solid #999}.id{font-weight:bold}p{margin:0 0 6pt}@page{margin:18mm}</style></head><body>${body}</body></html>`;
+  const f=document.createElement("iframe"); f.setAttribute("aria-hidden","true"); f.style.cssText="position:fixed;width:0;height:0;border:0;left:-9999px";
+  document.body.appendChild(f); const d=f.contentWindow.document; d.open(); d.write(html); d.close();
+  setTimeout(()=>{ try{ f.contentWindow.focus(); f.contentWindow.print(); }catch(e){ dlBlob(new Blob([html],{type:"text/html"}),`londres-${M.id}-${slug()}.html`); } setTimeout(()=>f.remove(),60000); },300);
+}
+/* Word (.docx) fabriqué dans le navigateur, sans bibliothèque */
+const CRC=(()=>{ const t=new Uint32Array(256); for(let n=0;n<256;n++){ let c=n; for(let k=0;k<8;k++) c = c&1 ? 0xEDB88320^(c>>>1) : c>>>1; t[n]=c>>>0; } return t; })();
+function crc32(u){ let c=0xFFFFFFFF; for(let i=0;i<u.length;i++) c=CRC[(c^u[i])&0xFF]^(c>>>8); return (c^0xFFFFFFFF)>>>0; }
+function zip(files){
+  const enc=new TextEncoder(), parts=[], cen=[]; let off=0;
+  const u16=v=>[v&255,(v>>8)&255], u32=v=>[v&255,(v>>8)&255,(v>>16)&255,(v>>>24)&255];
+  files.forEach(([name,str])=>{
+    const nb=enc.encode(name), data=enc.encode(str), c=crc32(data), sz=data.length;
+    const lh=new Uint8Array([...u32(0x04034b50),...u16(20),...u16(0x0800),...u16(0),...u16(0),...u16(33),...u32(c),...u32(sz),...u32(sz),...u16(nb.length),...u16(0)]);
+    parts.push(lh,nb,data);
+    cen.push(new Uint8Array([...u32(0x02014b50),...u16(20),...u16(20),...u16(0x0800),...u16(0),...u16(0),...u16(33),...u32(c),...u32(sz),...u32(sz),...u16(nb.length),...u16(0),...u16(0),...u16(0),...u16(0),...u32(0),...u32(off)]),nb);
+    off+=lh.length+nb.length+sz;
+  });
+  const cs=cen.reduce((a,b)=>a+b.length,0);
+  const end=new Uint8Array([...u32(0x06054b50),...u16(0),...u16(0),...u16(files.length),...u16(files.length),...u32(cs),...u32(off),...u16(0)]);
+  return new Blob([...parts,...cen,end],{type:"application/vnd.openxmlformats-officedocument.wordprocessingml.document"});
+}
+function makeDocx(M){
+  const x=t=>String(t).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+  const col=M.color.replace("#","");
+  const run=(t,o={})=>`<w:r><w:rPr><w:rFonts w:ascii="Arial" w:hAnsi="Arial"/>${o.b?"<w:b/>":""}${o.c?`<w:color w:val="${o.c}"/>`:""}<w:sz w:val="${o.sz||22}"/></w:rPr>`+String(t).split("\n").map((l,i)=>(i?"<w:br/>":"")+`<w:t xml:space="preserve">${x(l)}</w:t>`).join("")+"</w:r>";
+  const par=(r,av,ap)=>`<w:p><w:pPr><w:spacing w:before="${av||0}" w:after="${ap||100}"/></w:pPr>${r}</w:p>`;
+  const corps=recapBlocks(M).map(k=>{
+    if(k.t==="titre") return par(run(k.x,{b:1,sz:32,c:col}),0,160);
+    if(k.t==="id") return par(run(k.x,{b:1}),0,200);
+    if(k.t==="h") return par(run(k.x,{b:1,sz:26,c:col}),240,100);
+    if(k.t==="q") return par(run(k.l+" : ",{b:1})+run(k.x),0,100);
+    return par(run(k.x),0,80);
+  }).join("");
+  const doc=`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:body>${corps}<w:sectPr><w:pgSz w:w="11906" w:h="16838"/><w:pgMar w:top="1134" w:right="1134" w:bottom="1134" w:left="1134" w:header="708" w:footer="708" w:gutter="0"/></w:sectPr></w:body></w:document>`;
+  return zip([
+    ["[Content_Types].xml",'<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/></Types>'],
+    ["_rels/.rels",'<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/></Relationships>'],
+    ["word/document.xml",doc]
+  ]);
+}
+
 /* ---------- correction téléchargeable ---------- */
 function completion(M){
   const st=ms(M.id), miss=[];
@@ -878,19 +1036,11 @@ function completion(M){
   M.questions.forEach((q,i)=>{ if((st.q[i]||"").trim().length<MINC) miss.push(`votre réponse à la question ${i+1}`); });
   return miss;
 }
-function updDl(M){
-  const box=document.getElementById("dlMsg"), b=document.getElementById("dlBtn"); if(!box) return;
-  const miss = teacher ? [] : completion(M);
-  b.disabled = miss.length>0;
-  box.innerHTML = miss.length
-    ? `<p>La correction se débloque quand votre travail est terminé. Il vous reste à compléter :</p><ul>${miss.map(x=>`<li>${esc(x)}</li>`).join("")}</ul>`
-    : `<p>Bravo, votre travail est terminé ! Téléchargez la correction : elle contient votre travail à côté de la correction, puis la correction de toutes les missions. Vous pourrez l’ouvrir, l’imprimer ou l’enregistrer en PDF.</p>`;
-}
 const traceFull = sl => esc(sl.text).replace(/\[([^\]]+)\]/g,"<strong>$1</strong>");
 const SYNTH = "Londres est reliée au reste du monde par tous les modes de transport. Pour les personnes : cinq aéroports internationaux, l’Eurostar qui passe sous la Manche et des lignes d’autocars. Pour les marchandises : des camions qui traversent la Manche en ferry ou par le tunnel, et des porte-conteneurs qui partent du port de London Gateway. Ces flux de personnes et de marchandises font de Londres une métropole mondiale et une interface entre le Royaume-Uni, l’Europe et le monde. Plus le trajet est rapide, plus il est cher : chacun choisit selon son budget et son temps.";
 function buildCorrection(W){
   const date=new Date().toLocaleDateString("fr-FR",{day:"numeric",month:"long",year:"numeric"});
-  let b = `<header><h1>Londres, connectée au monde</h1><p class="sub">Géographie 4e · Correction${W?` · ${esc(W.tab)} · ${LV().name} (${LV().tag})`:" complète"} · ${date}</p>
+  let b = `<header><h1>Londres, connectée au monde</h1><p class="sub">Géographie 4e · Correction complète${S.eleve?` · ${esc(S.eleve)}`:""}${W?` · ${esc(W.tab)} · ${LV().name} (${LV().tag})`:""} · ${date}</p>
   <button class="noprint" onclick="window.print()">Imprimer ou enregistrer en PDF</button></header>`;
   if(W){
     const st=ms(W.id), T=totals(W);
@@ -905,6 +1055,13 @@ function buildCorrection(W){
     if(st.q.b && W.bonusC) b += `<div class="qa"><h4>Défi : ${esc(W.bonus)}</h4><p><b>Votre réponse :</b> ${esc(st.q.b)}</p><p class="c"><b>Correction :</b> ${esc(W.bonusC)}</p></div>`;
     b += `</section>`;
   }
+  const rows = MISSIONS.map(M=>({M, R:bilanRow(M)}));
+  b += `<section><h2>La mise en commun de la classe</h2>
+  <table><caption>Résultats présentés par les groupes</caption><thead><tr><th scope="col">Mission</th><th scope="col">Transports</th><th scope="col">Durée</th><th scope="col">Prix</th><th scope="col">Un atout de Londres montré</th></tr></thead><tbody>
+  ${rows.map(({M,R})=>{ const h=parseFloat(String(R.h).replace(",",".")), pr=parseFloat(String(R.p).replace(",","."));
+    return `<tr><th scope="row">${esc(R.nm)}</th><td>${esc(R.modes)||"—"}</td><td>${h?fmt(Math.round(h*60)):"—"}</td><td>${pr?eur(pr)+(M.ref?" ("+M.ref.unit+")":""):"—"}</td><td>${esc(R.a)||"—"}</td></tr>`; }).join("")}
+  </tbody></table>
+  <h3>Notre conclusion de classe</h3><p class="trace">${S.concl&&S.concl.trim()? esc(S.concl).replace(/\n/g,"<br>") : "(conclusion non rédigée)"}</p></section>`;
   b += `<section><h2>Correction de toutes les missions</h2>`;
   MISSIONS.forEach(M=>{
     b += `<article><h3>${esc(M.tab.replace(" (en classe)",""))} : ${esc(M.title)}</h3>`;
@@ -917,7 +1074,7 @@ function buildCorrection(W){
     }
     b += `</article>`;
   });
-  b += `</section><section><h2>Conclusion : Londres, une métropole connectée au monde</h2><p class="trace">${SYNTH}</p>
+  b += `</section><section><h2>Conclusion corrigée : Londres, une métropole connectée au monde</h2><p class="trace">${SYNTH}</p>
   <p class="note">Les durées et les prix sont des ordres de grandeur : ils changent selon la date et le moment de la réservation.</p></section>`;
   return `<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Correction – Londres, connectée au monde</title>
@@ -935,7 +1092,7 @@ article{break-inside:avoid-page}button{font:inherit;font-weight:700;padding:10px
 }
 function downloadCorrection(W){
   const html=buildCorrection(W), blob=new Blob([html],{type:"text/html"}), url=URL.createObjectURL(blob);
-  const a=document.createElement("a"); a.href=url; a.download=`correction-londres${W?"-"+W.id:""}.html`;
+  const a=document.createElement("a"); a.href=url; a.download=`correction-londres${W?"-"+W.id:""}-${slug()}.html`;
   document.body.appendChild(a); a.click(); a.remove();
   setTimeout(()=>URL.revokeObjectURL(url),60000);
   toast("Correction téléchargée : ouvrez le fichier pour la lire, l’imprimer ou l’enregistrer en PDF.");
@@ -943,20 +1100,32 @@ function downloadCorrection(W){
 window.buildCorrection = buildCorrection;
 
 /* ---------- mise en commun ---------- */
+function hasWork(M){
+  if(!M || M.guided) return false;
+  const st=ms(M.id);
+  return Object.values(st.steps).some(v=>v&&(v.h||v.m||v.p||v.n)) || Object.values(st.q).some(v=>v&&v.trim());
+}
+function bilanRow(M){
+  const b=S.bilan[M.id]||{}, T=totals(M), w=hasWork(M);
+  const autoH = w && T.t>150 ? (Math.round(T.t/6)/10) : "";
+  return { nm:M.tab.replace(" (en classe)",""),
+    modes: b.modes??(M.modes||M.steps.map(s=>s.md).join(", ")),
+    h: b.h??(autoH||(M.ref?M.ref.h:"")),
+    p: b.p??((w&&T.t>150&&T.p)||(M.ref?M.ref.p:"")),
+    a: b.a||"" };
+}
 function renderBilan(){
   setColor(null);
   let h=`<div class="mission-head"><div class="mh-top"><div class="badges"><span class="role" style="background:var(--ink);color:var(--paper)">${ic("📊")} Toute la classe</span></div><h2>Mise en commun</h2>
   <p>Chaque groupe présente son trajet. Complétez le tableau : les durées et les prix se comparent automatiquement. Les lignes camion et navire sont pré-remplies avec des ordres de grandeur, à corriger avec les résultats des élèves.</p></div><div style="height:16px"></div></div>
   <div class="tablewrap"><table><caption class="sr">Résultats des missions</caption><thead><tr><th scope="col">Mission</th><th scope="col">Transports</th><th scope="col">Durée (h)</th><th scope="col">Prix (€)</th><th scope="col">Un atout de Londres montré</th></tr></thead><tbody>`;
   MISSIONS.forEach(M=>{
-    const b=S.bilan[M.id]||{}, T=totals(M);
-    const autoH = T.t>150 ? (Math.round(T.t/6)/10) : "";
-    const nm=M.tab.replace(" (en classe)","");
+    const R=bilanRow(M), nm=R.nm;
     h+=`<tr><th scope="row"><span class="mname" style="--c:${M.color};--cl:${M.light}">${ic(M.icon)} ${esc(nm)}</span></th>
-    <td><input type="text" data-b="${M.id}" data-k="modes" aria-label="${esc(nm)} : transports" value="${esc(b.modes??(M.modes||M.steps.map(s=>s.md).join(", ")))}"></td>
-    <td><input type="number" min="0" step="0.5" data-b="${M.id}" data-k="h" aria-label="${esc(nm)} : durée en heures" value="${esc(b.h??(autoH||(M.ref?M.ref.h:"")))}"></td>
-    <td><input type="number" min="0" data-b="${M.id}" data-k="p" aria-label="${esc(nm)} : prix en euros${M.ref?", "+M.ref.unit:""}" value="${esc(b.p??((T.t>150&&T.p)||(M.ref?M.ref.p:"")))}">${M.ref?`<small class="unit">${M.ref.unit}</small>`:""}</td>
-    <td><input type="text" data-b="${M.id}" data-k="a" aria-label="${esc(nm)} : atout de Londres" value="${esc(b.a)}"></td></tr>`;
+    <td><input type="text" data-b="${M.id}" data-k="modes" aria-label="${esc(nm)} : transports" value="${esc(R.modes)}"></td>
+    <td><input type="number" min="0" step="0.5" data-b="${M.id}" data-k="h" aria-label="${esc(nm)} : durée en heures" value="${esc(R.h)}"></td>
+    <td><input type="number" min="0" data-b="${M.id}" data-k="p" aria-label="${esc(nm)} : prix en euros${M.ref?", "+M.ref.unit:""}" value="${esc(R.p)}">${M.ref?`<small class="unit">${M.ref.unit}</small>`:""}</td>
+    <td><input type="text" data-b="${M.id}" data-k="a" aria-label="${esc(nm)} : atout de Londres" value="${esc(R.a)}"></td></tr>`;
   });
   h+=`</tbody></table></div>
   <section class="bars" aria-labelledby="b1"><h3 id="b1" class="disp" style="font-size:1.2rem;margin-bottom:6px">Combien de temps pour rejoindre Londres ?</h3><div id="bars"></div></section>
@@ -973,7 +1142,7 @@ function renderBilan(){
   view.querySelectorAll(".word").forEach(b=>b.onclick=()=>{ c.value=(c.value+(c.value&&!/\s$/.test(c.value)?", ":"")+b.dataset.w).trimStart(); S.concl=c.value; save(); c.focus(); });
   document.getElementById("dlAll").onclick=()=>{
     const M=MISSIONS.find(m=>m.id===S.pickM && !m.guided);
-    if(teacher || (M && !completion(M).length)) downloadCorrection(M && !teacher ? M : null);
+    if(teacher || (M && !completion(M).length)) downloadCorrection(hasWork(M) ? M : null);
     else toast("La correction se débloque quand votre mission est terminée (ou avec le code enseignant).");
   };
   document.getElementById("clrB").onclick=()=>{ S.bilan={}; save(); renderBilan(); toast("Tableau remis à zéro."); };
@@ -1001,7 +1170,7 @@ document.getElementById("treset").onclick=()=>{ clearInterval(iv); run=false; le
   b.onclick=()=>{
     if(!armed){ armed=true; b.textContent="Cliquez encore pour confirmer"; b.classList.add("danger"); tm=setTimeout(()=>{ armed=false; b.textContent="Effacer mes réponses"; b.classList.remove("danger"); },5000); return; }
     clearTimeout(tm); armed=false; b.textContent="Effacer mes réponses"; b.classList.remove("danger");
-    S={cur:S.cur,m:{},bilan:{},ref:S.ref,guide:0,concl:"",level:S.level,focus:{},a11y:S.a11y,pickM:S.pickM}; save(); render(false); toast("Réponses effacées.");
+    S={cur:S.cur,m:{},bilan:{},ref:S.ref,guide:0,concl:"",level:S.level,focus:{},a11y:S.a11y,pickM:S.pickM,eleve:S.eleve}; save(); render(false); toast("Réponses effacées.");
   };
 })();
 document.getElementById("tcode").oninput=e=>{ const on=e.target.value.trim().toLowerCase()==="prof"; if(on!==teacher){ teacher=on; render(false); } };
