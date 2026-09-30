@@ -235,6 +235,16 @@ td input{ min-width:90px; }
 .filebtn{ display:inline-flex; align-items:center; }
 .filebtn input{ position:absolute; opacity:0; width:1px; height:1px; }
 .filebtn:focus-within{ outline:3px solid var(--mt); outline-offset:3px; }
+.part{ border-top:1px dashed var(--line); padding:12px 0 6px; }
+.plab{ display:flex; flex-wrap:wrap; gap:8px 12px; align-items:center; margin-bottom:8px; }
+.pname{ font-weight:700; }
+.plab .lk{ min-height:40px; padding:6px 10px; font-size:.95rem; }
+.calc{ font-weight:700; background:var(--soft); border-left:5px solid var(--mt); border-radius:8px; padding:8px 12px; margin:10px 0 4px; }
+.subtot{ font-weight:700; font-size:1.05rem; border-top:2px solid var(--line); padding-top:10px; margin:10px 0; }
+fieldset.choices{ border:0; padding:0; margin:0 0 6px; }
+fieldset.choices > legend{ font-weight:700; margin-bottom:6px; }
+.choice-box{ border:2px solid var(--line); border-radius:12px; padding:6px 14px 4px; margin-bottom:10px; }
+.choice-box.on{ border-color:var(--mt); box-shadow:inset 6px 0 0 var(--m); }
 .snav{ display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap; margin-top:14px; }
 .dots{ display:flex; gap:4px; }
 .sdot{ width:36px; height:36px; border:0; background:none; padding:0; cursor:pointer; display:grid; place-items:center; }
@@ -320,20 +330,33 @@ const L = {
 };
 
 const MISSIONS = [
-{ id:"avion", color:"#C2185B", light:"#F48FB1", icon:"✈️", tab:"Touristes · avion",
+{ id:"avion", atout:"Londres a cinq aéroports internationaux et des vols directs depuis toute l’Europe et le monde : c’est une ville très facile d’accès pour les touristes, un hub aérien.", color:"#C2185B", light:"#F48FB1", icon:"✈️", tab:"Touristes · avion",
   role:"Vous êtes des touristes", title:"Visiter le British Museum",
   intro:"Vous partez de La Grand-Combe pour visiter le British Museum, au cœur de Londres. Trouvez le trajet le plus pratique.",
   stops:["La Grand-Combe","Aéroport de Montpellier","Londres-Gatwick","British Museum"],
   steps:[
-    {l2:{label:"La Grand-Combe → aéroport de Montpellier en transports en commun (TER + navette)", m:150, p:20}, mode:"🚆", md:"train et navette, ou voiture", task:"Trouvez comment rejoindre l’aéroport de Montpellier. Comparez les transports en commun et la voiture.",
-     links:[{label:"Itinéraire en transports en commun",url:g("Gare de La Grand-Combe-La Pise","Aéroport Montpellier Méditerranée","transit")},{label:"Itinéraire en voiture",url:g("La Grand-Combe","Aéroport Montpellier Méditerranée","driving")}],
-     hint:"Google Maps propose le TER jusqu’à Nîmes puis Montpellier, puis une navette vers l’aéroport. Gardez le trajet le plus simple pour des touristes."},
-    {mode:"✈️", md:"avion", task:"Trouvez un vol direct Montpellier → Londres-Gatwick. Notez la durée du vol et son prix. Le temps d’attente à l’aéroport est déjà compté.", fixed:[{label:"Attente à l’aéroport (contrôles, embarquement)", m:90, src:"moyenne conseillée par les compagnies"}],
-     links:[L.flights],
+    {mode:"🚆", md:"transports en commun ou voiture",
+     task:"Comparez les deux façons de rejoindre l’aéroport de Montpellier : remplissez les deux lignes, puis choisissez la plus pratique pour des touristes.",
+     choices:[
+       {id:"tc", label:"En transports en commun (train + navette)", parts:[
+         {label:"La Grand-Combe → aéroport de Montpellier en transports en commun", link:{label:"Google Maps · transports en commun",url:g("Gare de La Grand-Combe-La Pise","Aéroport Montpellier Méditerranée","transit")}, lv:{2:{m:150,p:20}}}]},
+       {id:"vo", label:"En voiture", parts:[
+         {label:"La Grand-Combe → aéroport de Montpellier en voiture", link:{label:"Google Maps · voiture",url:g("La Grand-Combe","Aéroport Montpellier Méditerranée","driving")}, calcCar:true}]}
+     ],
+     infos:[{label:"Voiture : environ 0,15 € d’essence par km, et un parking à l’aéroport d’environ 10 € par jour", src:"ordre de grandeur"}],
+     hint:"En transports en commun, Google Maps propose le TER jusqu’à Nîmes puis Montpellier, puis une navette. Pour la voiture, notez la distance : le prix se calcule tout seul. Pensez aux bagages, au prix et au parking pour choisir."},
+    {mode:"✈️", md:"avion",
+     task:"Trouvez un vol direct Montpellier → Londres-Gatwick. Notez la durée du vol et son prix. Le temps d’attente à l’aéroport est déjà compté.",
+     parts:[
+       {label:"Attente à l’aéroport (contrôles, embarquement)", fixed:{m:90}, src:"moyenne conseillée par les compagnies"},
+       {label:"Vol Montpellier → Londres-Gatwick", link:L.flights}],
      hint:"Il n’y a pas de vol direct vers Heathrow : cherchez Gatwick (LGW). Attention, il est 1 h de moins à Londres : ne calculez pas la durée avec les heures affichées, lisez la durée du vol."},
-    {l3:{label:"Gatwick → British Museum en train et métro", m:70, p:20}, mode:"🚇", md:"train et métro", task:"De Gatwick, trouvez comment rejoindre le British Museum en transports en commun.",
-     links:[{label:"Itinéraire Google Maps",url:g("Gatwick Airport","British Museum, London","transit")},L.tfl],
-     hint:"Le prix est en livres sterling (£) : utilisez le taux fourni et arrondissez.", fixed:[{label:"1 £ ≈ 1,15 € : multipliez les prix en livres par 1,15", info:true, src:"taux de change arrondi"}]}
+    {mode:"🚇", md:"train et métro",
+     task:"De Gatwick, trouvez comment rejoindre le British Museum en transports en commun. Google Maps donne tout le trajet d’un coup (train puis métro).",
+     parts:[
+       {label:"Gatwick → British Museum en train et métro", link:{label:"Google Maps · transports en commun",url:g("Gatwick Airport","British Museum, London","transit")}, lv:{3:{m:70,p:20}}}],
+     infos:[{label:"1 £ ≈ 1,15 € : multipliez les prix en livres par 1,15", src:"taux de change arrondi"}],
+     hint:"Le prix est en livres sterling (£) : utilisez le taux fourni et arrondissez."}
   ],
   corrSteps:["La Grand-Combe → aéroport de Montpellier : environ 2 h 30 en transports en commun (TER jusqu’à Nîmes puis Montpellier, puis navette), pour environ 20 €. En voiture : environ 1 h 15.", "Vol direct Montpellier → Londres-Gatwick : environ 1 h 55, de 50 à 150 € selon la date, plus 1 h 30 d’attente à l’aéroport. Il n’y a pas de vol direct vers Heathrow.", "Gatwick → British Museum : train (Thameslink ou Gatwick Express) puis métro, environ 1 h à 1 h 15, pour environ 20 €.", "Total : environ 6 h 30 à 7 h 30, pour 110 à 200 € l’aller simple."],
   questions:[
@@ -343,22 +366,29 @@ const MISSIONS = [
   bonus:"Combien d’aéroports compte Londres ? Cherchez lequel est le plus fréquenté.", bonusC:"Londres compte 5 aéroports internationaux. Heathrow est le plus fréquenté : plus de 80 millions de passagers par an, l’un des plus grands aéroports du monde.",
   teacher:["La Grand-Combe → aéroport : ~1 h 15 en voiture ; 2 h 30 à 3 h en transports (TER via Nîmes + navette).","Vol easyJet Montpellier → Gatwick direct, ~1 h 55, prix de ~50 à 150 € selon la date. Pas de direct vers Heathrow.","Gatwick → British Museum : Thameslink ou Gatwick Express + métro, ~1 h à 1 h 15, ~15 à 25 £.","Total réaliste avec l’attente aéroport : 6 h 30 à 7 h 30."]
 },
-{ id:"train", color:"#1B7F55", light:"#6FD3A5", icon:"🚄", tab:"Cadres · train",
+{ id:"train", atout:"Grâce à l’Eurostar et au tunnel sous la Manche, Londres est à un peu plus de 2 h de Paris, de centre-ville à centre-ville : elle est intégrée au réseau européen de grande vitesse, ce qui compte pour les affaires (Canary Wharf).", color:"#1B7F55", light:"#6FD3A5", icon:"🚄", tab:"Cadres · train",
   role:"Vous êtes des cadres d’entreprise", title:"Rejoindre Canary Wharf",
   intro:"Vous partez de La Grand-Combe pour une réunion dans le quartier d’affaires de Canary Wharf. Vous voyagez uniquement en train.",
   stops:["La Grand-Combe","Paris Gare de Lyon","Paris Gare du Nord","Londres St Pancras","Canary Wharf"],
   steps:[
-    {mode:"🚄", md:"TER puis TGV", task:"Cherchez un trajet La Grand-Combe → Paris Gare de Lyon (TER jusqu’à Nîmes, puis TGV). Notez la durée et le prix.",
-     links:[L.sncf,L.ter],
-     hint:"Sur SNCF Connect, tapez « La Grand-Combe » et « Paris Gare de Lyon » : le site trouve seul la correspondance à Nîmes."},
-    {l2:{label:"Trajet en RER D, Gare de Lyon → Gare du Nord", m:15}, mode:"🚇", md:"RER", task:"À Paris, changez de gare : Gare de Lyon → Gare du Nord.",
-     links:[{label:"Itinéraire Google Maps",url:g("Gare de Lyon, Paris","Gare du Nord, Paris","transit")}],
-     hint:"Le RER D relie directement les deux gares. Le prix du ticket est déjà compté.", fixed:[{label:"Ticket de RER", p:2.5, src:"tarif Île-de-France Mobilités"}]},
-    {mode:"🚄", md:"Eurostar", task:"Trouvez un Eurostar Paris Gare du Nord → Londres St Pancras. Le temps des contrôles avant le départ est déjà compté.", fixed:[{label:"Contrôles avant le départ (passeport, douane)", m:60, src:"délai conseillé par Eurostar"}],
-     links:[L.eurostar],
+    {mode:"🚄", md:"TER puis TGV",
+     task:"Cherchez un trajet La Grand-Combe → Paris Gare de Lyon. SNCF Connect trouve seul le TER jusqu’à Nîmes et le TGV jusqu’à Paris : notez la durée totale et le prix.",
+     parts:[{label:"La Grand-Combe → Paris Gare de Lyon (TER + TGV)", link:L.sncf}],
+     hint:"Tapez « La Grand-Combe » et « Paris Gare de Lyon » : le site affiche la correspondance à Nîmes. Gardez un trajet avec un seul changement."},
+    {mode:"🚇", md:"RER",
+     task:"À Paris, changez de gare : Gare de Lyon → Gare du Nord. Notez la durée ; le prix du ticket est fourni.",
+     parts:[{label:"Gare de Lyon → Gare du Nord en RER D", link:{label:"Google Maps · transports en commun",url:g("Gare de Lyon, Paris","Gare du Nord, Paris","transit")}, fixP:2.5, src:"tarif Île-de-France Mobilités", lv:{2:{m:15,p:2.5}}}],
+     hint:"Le RER D relie directement les deux gares."},
+    {mode:"🚄", md:"Eurostar",
+     task:"Trouvez un Eurostar Paris Gare du Nord → Londres St Pancras. Le temps des contrôles avant le départ est déjà compté.",
+     parts:[
+       {label:"Contrôles avant le départ (passeport, douane)", fixed:{m:60}, src:"délai conseillé par Eurostar"},
+       {label:"Eurostar Paris Gare du Nord → Londres St Pancras", link:L.eurostar}],
      hint:"Le trajet dure un peu plus de 2 h. Les prix changent beaucoup selon la date et l’heure."},
-    {l3:{label:"St Pancras → Canary Wharf en métro", m:30, p:3}, mode:"🚇", md:"métro", task:"De St Pancras, rejoignez Canary Wharf en métro.",
-     links:[{label:"Itinéraire Google Maps",url:g("St Pancras International, London","Canary Wharf, London","transit")},L.tfl],
+    {mode:"🚇", md:"métro",
+     task:"De St Pancras, rejoignez Canary Wharf en métro.",
+     parts:[{label:"St Pancras → Canary Wharf en métro", link:{label:"Google Maps · transports en commun",url:g("St Pancras International, London","Canary Wharf, London","transit")}, lv:{3:{m:30,p:3}}}],
+     infos:[{label:"1 £ ≈ 1,15 € : multipliez les prix en livres par 1,15", src:"taux de change arrondi"}],
      hint:"Plusieurs lignes sont possibles (Jubilee, Elizabeth line, DLR). Choisissez la plus rapide."}
   ],
   corrSteps:["La Grand-Combe → Paris Gare de Lyon : TER jusqu’à Nîmes (environ 50 min), puis TGV jusqu’à Paris (environ 3 h).", "Gare de Lyon → Gare du Nord : RER D, environ 15 min, 2,50 €.", "Eurostar Paris Gare du Nord → Londres St Pancras : environ 2 h 20, plus 1 h de contrôles avant le départ.", "St Pancras → Canary Wharf : métro (Jubilee, Elizabeth line ou DLR), environ 30 min, environ 3 €.", "Total : environ 8 h 30 à 9 h 30, de 150 à 350 € selon la date."],
@@ -369,20 +399,24 @@ const MISSIONS = [
   bonus:"Pourquoi une entreprise installe-t-elle ses bureaux à Canary Wharf plutôt qu’en banlieue lointaine ?", bonusC:"Canary Wharf est un quartier d’affaires qui regroupe des banques et des sièges de grandes entreprises. Il est très bien desservi (métro, Elizabeth line, DLR, aéroport de London City tout proche). Les entreprises veulent être proches les unes des autres, de leurs clients et des voyageurs internationaux.",
   teacher:["TER La Grand-Combe → Nîmes ~50 min ; TGV Nîmes → Paris Gare de Lyon ~3 h.","RER D Gare de Lyon → Gare du Nord ~10 min (+ correspondance).","Eurostar ~2 h 20 + ~1 h de contrôles. St Pancras → Canary Wharf ~25 à 35 min.","Total : 8 h 30 à 9 h 30, prix très variable (150 à 350 €)."]
 },
-{ id:"bus", color:"#8C5E00", light:"#F2C14E", icon:"🚌", tab:"Étudiants · bus",
+{ id:"bus", atout:"Londres est accessible même avec un petit budget, grâce aux lignes d’autocars internationales qui arrivent à Victoria Coach Station : elle attire des étudiants du monde entier.", color:"#8C5E00", light:"#F2C14E", icon:"🚌", tab:"Étudiants · bus",
   role:"Vous êtes étudiants", title:"Rejoindre l’université de Londres",
   intro:"Vous partez de La Grand-Combe pour rejoindre l’université de Londres, dans le quartier de Bloomsbury. Votre budget est serré.",
   stops:["La Grand-Combe","Nîmes","Victoria Coach Station","Bloomsbury"],
   steps:[
-    {l2:{label:"TER La Grand-Combe → Nîmes", m:50, p:12}, mode:"🚆", md:"TER", task:"Trouvez un train La Grand-Combe → Nîmes. Notez le prix et la durée.",
-     links:[L.ter],
+    {mode:"🚆", md:"TER",
+     task:"Trouvez un train La Grand-Combe → Nîmes. Notez la durée et le prix.",
+     parts:[{label:"TER La Grand-Combe → Nîmes", link:L.sncf, lv:{2:{m:50,p:12}}}],
      hint:"Gare de départ : « La Grand-Combe-La Pise ». Gare d’arrivée : « Nîmes Centre »."},
-    {mode:"🚌", md:"autocar FlixBus", task:"Trouvez un bus Nîmes → Londres Victoria Coach Station (la gare routière). Notez le prix, la durée et le nombre de changements.",
-     links:[L.flix],
+    {mode:"🚌", md:"autocar FlixBus",
+     task:"Trouvez un bus Nîmes → Londres Victoria Coach Station (la gare routière). Notez la durée, le prix et le nombre de changements.",
+     parts:[{label:"FlixBus Nîmes → Londres Victoria Coach Station", link:L.flix}],
      hint:"Le trajet dure presque une journée entière, souvent avec des changements de bus. C’est normal : c’est le trajet le moins cher."},
-    {l3:{label:"Victoria Coach Station → Bloomsbury en métro", m:20, p:3}, mode:"🚇", md:"métro", task:"De Victoria Coach Station, trouvez le transport en commun le plus rapide jusqu’à l’université (Senate House).",
-     links:[{label:"Itinéraire Google Maps",url:g("Victoria Coach Station, London","Senate House, University of London","transit")},L.tfl],
-     hint:"Cherchez la ligne de métro Victoria (couleur bleu clair).", fixed:[{label:"1 £ ≈ 1,15 € : multipliez les prix en livres par 1,15", info:true, src:"taux de change arrondi"}]}
+    {mode:"🚇", md:"métro",
+     task:"De Victoria Coach Station, trouvez le transport en commun le plus rapide jusqu’à l’université (Senate House).",
+     parts:[{label:"Victoria Coach Station → Bloomsbury en métro", link:{label:"Google Maps · transports en commun",url:g("Victoria Coach Station, London","Senate House, University of London","transit")}, lv:{3:{m:20,p:3}}}],
+     infos:[{label:"1 £ ≈ 1,15 € : multipliez les prix en livres par 1,15", src:"taux de change arrondi"}],
+     hint:"Cherchez la ligne de métro Victoria (couleur bleu clair)."}
   ],
   corrSteps:["TER La Grand-Combe → Nîmes : environ 50 min, environ 12 €.", "FlixBus Nîmes → Londres Victoria Coach Station : de 20 à 24 h, souvent avec 1 ou 2 changements, de 80 à 130 €.", "Victoria Coach Station → Bloomsbury : métro (ligne Victoria), environ 20 min, environ 3 €.", "Total : environ 22 à 26 h, pour 100 à 150 € l’aller simple."],
   questions:[
@@ -392,20 +426,23 @@ const MISSIONS = [
   bonus:"Pourquoi Londres attire-t-elle des étudiants du monde entier ?", bonusC:"Londres compte de nombreuses universités réputées, on y parle anglais (la langue internationale), on y trouve des emplois et une vie culturelle très riche. C’est une métropole mondiale qui attire les talents.",
   teacher:["TER La Grand-Combe → Nîmes ~50 min, ~10 à 13 €.","FlixBus Nîmes → Victoria Coach Station : ~20 à 24 h, souvent 1 à 2 changements, ~80 à 130 €.","Victoria → Bloomsbury ~20 min de métro, ~3 £.","Traversée : navette Eurotunnel ou ferry selon la ligne (d’où la reformulation de la question)."]
 },
-{ id:"camion", ref:{h:36, p:2800, unit:"par camion"}, color:"#6446C8", light:"#B7A4F5", icon:"🚚", tab:"Transporteurs · camion",
+{ id:"camion", atout:"Londres est reliée au continent par la route, grâce au ferry ou au tunnel entre Calais et Douvres : des camions l’approvisionnent en produits venus de toute l’Europe.", ref:{h:36, p:2800, unit:"par camion"}, color:"#6446C8", light:"#B7A4F5", icon:"🚚", tab:"Transporteurs · camion",
   role:"Vous êtes transporteurs routiers", title:"Livrer des pélardons à Covent Garden",
   intro:"Votre camion transporte une cargaison de pélardons (fromage de chèvre des Cévennes) de La Grand-Combe jusqu’à Covent Garden, au centre de Londres.",
   stops:["La Grand-Combe","Calais","Douvres","Covent Garden"],
   steps:[
-    {l3:{label:"La Grand-Combe → Calais : environ 1 000 km et 15 h de conduite en camion", m:900, p:2000}, mode:"🚚", md:"route", task:"Trouvez l’itinéraire routier le plus rapide jusqu’au port de Calais. Notez la distance, la durée et les autoroutes principales.",
-     links:[{label:"Itinéraire Google Maps",url:g("La Grand-Combe","Port de Calais","driving")}],
-     hint:"Google Maps calcule pour une voiture. Un camion roule moins vite (90 km/h) et le chauffeur doit faire des pauses : comptez environ 1,5 fois plus de temps. Pour le prix, multipliez la distance par 2 (voir le tarif fourni).", fixed:[{label:"Tarif d’un camion frigorifique : environ 2 € par km (chauffeur, gazole, péages)", info:true, src:"ordre de grandeur des transporteurs"}]},
-    {mode:"⛴️", md:"ferry", task:"Traversez la Manche en ferry de Calais à Douvres (Dover). Ces données ne se trouvent pas facilement en ligne : elles vous sont fournies. Repérez simplement la traversée sur la carte.", givenOnly:true, fixed:[{label:"Traversée Calais → Douvres, camion et chauffeur", m:90, p:400, src:"ordre de grandeur retenu pour l’exercice"}],
-     links:[{label:"Voir le trajet sur la carte",url:g("Port de Calais","Port of Dover","driving")}],
+    {mode:"🚚", md:"route",
+     task:"Trouvez l’itinéraire routier le plus rapide jusqu’au port de Calais. Notez la distance et la durée indiquées par Google Maps : la durée et le prix pour un camion se calculent tout seuls.",
+     parts:[{label:"La Grand-Combe → port de Calais", link:{label:"Google Maps · voiture",url:g("La Grand-Combe","Port de Calais","driving")}, calcTruck:true, lv:{3:{km:1000,car:600}}}],
+     hint:"Google Maps calcule pour une voiture. Un camion roule moins vite (90 km/h) et le chauffeur doit faire des pauses : l’outil multiplie la durée par 1,5. Le prix : 2 € par kilomètre."},
+    {mode:"⛴️", md:"ferry",
+     task:"Traversez la Manche en ferry de Calais à Douvres (Dover). Ces données ne se trouvent pas facilement en ligne : elles vous sont fournies. Repérez simplement la traversée sur la carte.",
+     parts:[{label:"Traversée Calais → Douvres, camion et chauffeur", fixed:{m:90,p:400}, src:"ordre de grandeur retenu pour l’exercice", link:{label:"Voir le trajet sur la carte",url:g("Port de Calais","Port of Dover","driving")}}],
      hint:"Si Google Maps propose « Le Shuttle » (le train du tunnel), c’est une autre solution. Pour cette mission, gardez le ferry."},
-    {l2:{label:"Douvres → Covent Garden : 120 km, environ 2 h", m:120, p:240}, l2only:true, mode:"🚚", md:"route", task:"De Douvres, rejoignez Covent Garden. Notez la distance, la durée et le prix.",
-     links:[{label:"Itinéraire Google Maps",url:g("Port of Dover","Covent Garden, London","driving")}],
-     hint:"Attention : au Royaume-Uni, on roule à gauche ! Pour le prix, multipliez la distance par 2.", fixed:[{label:"Même tarif : environ 2 € par km", info:true, src:"ordre de grandeur des transporteurs"}]}
+    {mode:"🚚", md:"route",
+     task:"De Douvres, rejoignez Covent Garden. Notez la distance et la durée indiquées par Google Maps.",
+     parts:[{label:"Port de Douvres → Covent Garden", link:{label:"Google Maps · voiture",url:g("Port of Dover","Covent Garden, London","driving")}, calcTruck:true, lv:{2:{km:120,car:80}}, lvOnly2:true}],
+     hint:"Attention : au Royaume-Uni, on roule à gauche !"}
   ],
   corrSteps:["La Grand-Combe → Calais : environ 1 000 km. Google Maps indique environ 10 h en voiture ; en camion, il faut environ 15 h de conduite, soit 1,5 à 2 jours avec les pauses obligatoires. Prix : environ 2 000 € (1 000 km × 2 €).", "Ferry Calais → Douvres : environ 1 h 30, environ 400 € pour le camion et son chauffeur.", "Douvres → Covent Garden : environ 120 km, 2 h de route, environ 240 €.", "Total : environ 1,5 à 2 jours, pour 2 500 à 3 000 € le voyage (pour tout le camion)."],
   questions:[
@@ -421,7 +458,7 @@ const MISSIONS = [
          {label:"Douane française, « Contrôles sanitaires à l’importation au Royaume-Uni »", url:"https://www.douane.gouv.fr/fiche/controles-sanitaires-et-phytosanitaires-limportation-au-royaume-uni"}]}, bonusC:"Il faut un camion frigorifique pour garder les fromages au froid. Depuis le Brexit, le Royaume-Uni ne fait plus partie de l’Union européenne : il faut une déclaration en douane et, depuis 2024, un certificat sanitaire signé par un vétérinaire pour les produits laitiers. Des contrôles peuvent avoir lieu à la frontière. Cela prend du temps et fait monter les coûts.",
   teacher:["La Grand-Combe → Calais : ~1 000 km, ~10 h en voiture ; en camion (90 km/h, pauses, 9 h de conduite/jour max) 1,5 à 2 jours.","Axes : A7, puis A6 ou A26 (« autoroute des Anglais »), A16 ; M20 au Royaume-Uni.","Ferry Calais–Douvres ~1 h 30. Douvres → Covent Garden ~120 km, ~2 h.","Prix : ~2 €/km pour un camion frigorifique (1,45 à 1,65 €/km pour un semi standard selon le CNR, davantage en frigo) + ~400 € de ferry : environ 2 500 à 3 000 € le voyage.","Google Maps propose souvent Le Shuttle : les liens forcent le passage par les ports.","Brexit : un accord sanitaire UE–Royaume-Uni est en négociation depuis 2025, les règles peuvent évoluer."]
 },
-{ id:"navire", ref:{h:146, p:2000, unit:"par conteneur"}, color:"#0F6F8F", light:"#7FCBE3", icon:"🚢", tab:"Armateurs · navire (en classe)", guided:true,
+{ id:"navire", atout:"Avec London Gateway, Londres dispose d’un port en eau profonde qui accueille les plus grands porte-conteneurs : elle est branchée sur les routes maritimes de la mondialisation.", ref:{h:146, p:2000, unit:"par conteneur"}, color:"#0F6F8F", light:"#7FCBE3", icon:"🚢", tab:"Armateurs · navire (en classe)", guided:true,
   modes:"porte-conteneurs, camion",
   role:"Toute la classe, avec le professeur", title:"Livrer une usine à Alès",
   intro:"Un porte-conteneurs part du port de London Gateway. Ses conteneurs sont destinés à l’usine NTN d’Alès. Suivons-le ensemble, étape par étape.",
@@ -472,7 +509,7 @@ const LEVELS = [
 ];
 
 /* ---------- état ---------- */
-const KEY = "londres-4e-v2";
+const KEY = "londres-4e-v3";
 let S = {};
 try{ S = JSON.parse(localStorage.getItem(KEY)) || JSON.parse(localStorage.getItem("londres-4e-v1")) || {}; }catch(e){ S = {}; }
 S.m = S.m || {}; S.bilan = S.bilan || {}; S.focus = S.focus || {};
@@ -505,22 +542,49 @@ const lvl = () => S.level || 1;
 const LV = () => LEVELS[lvl()-1];
 
 /* étape vue selon le parcours */
-function sview(s){
-  let given = !!s.givenOnly, fixed = [...(s.fixed||[])];
-  if(lvl()>=2 && s.l2 && !(s.l2only && lvl()>=3)){ given = true; fixed.push({...s.l2, src:"donnée fournie pour votre parcours"}); }
-  if(lvl()>=3 && s.l3){ given = true; fixed.push({...s.l3, src:"donnée fournie pour votre parcours"}); }
-  return {given, fixed};
+/* étapes : lignes (une par outil), choix, calculs automatiques */
+function stepParts(s){
+  if(s.choices) return s.choices.flatMap(c=>c.parts.map((p,j)=>({p, key:c.id+"-"+j, cid:c.id})));
+  return (s.parts||[]).map((p,j)=>({p, key:String(j), cid:null}));
+}
+function lvGiven(p){
+  const L=lvl(); if(!p.lv) return null;
+  if(L>=3 && p.lv[3]) return p.lv[3];
+  if(L>=2 && p.lv[2] && !(p.lvOnly2 && L>=3)) return p.lv[2];
+  return null;
+}
+function partVal(p, v){
+  v = v||{};
+  const isCalc = p.calcTruck||p.calcCar;
+  const calc = (km,car) => p.calcTruck ? {m:Math.round(car*1.5), p:Math.round(km*2), km, car} : {m:car, p:Math.round(km*0.15), km, car};
+  if(p.fixed) return {m:p.fixed.m||0, p:p.fixed.p||0, given:true, done:true, src:p.src};
+  const g = lvGiven(p);
+  if(g){ const src="donnée fournie pour votre parcours"; return isCalc ? {...calc(g.km,g.car), given:true, done:true, src} : {m:g.m||0, p:g.p||0, given:true, done:true, src}; }
+  const dur = (+v.h||0)*60+(+v.m||0);
+  if(isCalc){ const km=+v.km||0; return {...calc(km,dur), done: km>0 && dur>0}; }
+  return {m:dur, p: p.fixP!=null ? p.fixP : (+v.p||0), done: dur>0};
+}
+function stepVal(M,i){
+  const s=M.steps[i], sv=ms(M.id).steps[i]||{}, parts=sv.parts||{};
+  let list=stepParts(s);
+  if(s.choices) list=list.filter(x=>x.cid===sv.choice);
+  let m=0,p=0,done=list.length>0,given=list.length>0;
+  list.forEach(x=>{ const r=partVal(x.p, parts[x.key]); m+=r.m||0; p+=r.p||0; if(!r.done) done=false; if(!r.given) given=false; });
+  return {m,p,done,given, needChoice: !!s.choices && !sv.choice};
 }
 function totals(M){
-  const st = ms(M.id).steps; let t=0,p=0,done=0;
-  M.steps.forEach((s,i)=>{
-    const v=st[i]||{}, V=sview(s);
-    const d = V.given ? 0 : (+v.h||0)*60+(+v.m||0);
-    t+=d; if(!V.given) p+=(+v.p||0);
-    V.fixed.forEach(f=>{ if(!f.info){ t+=f.m||0; p+=f.p||0; } });
-    if(d>0||v.n||V.given) done++;
-  });
+  let t=0,p=0,done=0;
+  M.steps.forEach((s,i)=>{ const v=stepVal(M,i); t+=v.m; p+=v.p; if(v.done) done++; });
   return {t,p,done};
+}
+const vals = r => [r.km?r.km.toLocaleString("fr-FR")+" km":"", r.m?fmt(r.m):"", r.p?eur(r.p):""].filter(Boolean).join(" · ");
+function stepDesc(M,i){
+  const s=M.steps[i], sv=ms(M.id).steps[i]||{}, parts=sv.parts||{}, out=[];
+  let list=stepParts(s);
+  if(s.choices){ const c=s.choices.find(c=>c.id===sv.choice); out.push(c?`Solution choisie : ${c.label}`:"Solution : pas encore choisie"); list=list.filter(x=>x.cid===sv.choice); }
+  list.forEach(x=>{ const r=partVal(x.p, parts[x.key]); out.push(`${x.p.label} : ${vals(r)||"—"}${x.p.calcTruck?" (durée en camion)":""}${r.given?" – donnée fournie":""}`); });
+  if(sv.n) out.push("Remarques : "+sv.n);
+  return out;
 }
 function setColor(M){
   const r=document.documentElement.style;
@@ -622,39 +686,63 @@ function renderHome(){
 
 /* ---------- mission de recherche ---------- */
 function routeHTML(M){
-  const st = ms(M.id).steps;
   let h = '<ol class="line" aria-label="Étapes du trajet">';
   M.stops.forEach((s,i)=>{
     h += `<li class="stop ${i===M.stops.length-1?'end':''}"><span class="pin" aria-hidden="true"></span><span class="nm">${esc(s)}</span></li>`;
-    if(i<M.stops.length-1){
-      const S2=M.steps[i]||{}, v=st[i]||{}, V=sview(S2);
-      const ok = ((+v.h||0)+(+v.m||0))>0 || v.n || V.given;
-      h += `<li class="seg ${ok?'ok':''}" aria-hidden="true"><span class="ico">${S2.mode||""}</span></li>`;
-    }
+    if(i<M.stops.length-1){ const ok=stepVal(M,i).done; h += `<li class="seg ${ok?'ok':''}" aria-hidden="true"><span class="ico">${M.steps[i].mode||""}</span></li>`; }
   });
   return h+"</ol>";
 }
 function progressText(M,T){ return `${T.done} étape${T.done>1?"s":""} complétée${T.done>1?"s":""} sur ${M.steps.length}. Le trait devient plein quand une étape est remplie.`; }
 
+function calcText(p,r){
+  if(!r.done) return "Calcul automatique : remplissez la distance et la durée.";
+  return p.calcTruck
+    ? `Calcul automatique : durée en camion ≈ ${fmt(r.m)} (durée voiture × 1,5) · prix ≈ ${eur(r.p)} (${r.km.toLocaleString("fr-FR")} km × 2 €)`
+    : `Calcul automatique : essence ≈ ${eur(r.p)} (${r.km.toLocaleString("fr-FR")} km × 0,15 €)`;
+}
+function subText(M,i){
+  const v=stepVal(M,i);
+  if(v.needChoice) return `Sous-total de l’étape ${i+1} : choisissez une solution.`;
+  return `Sous-total de l’étape ${i+1} : ${v.m?fmt(v.m):"—"} · ${v.p?eur(v.p):"—"}`;
+}
+function partHTML(M,i,x,v){
+  v = v||{};
+  const p=x.p, r=partVal(p,v), id=`s${i}_${x.key}`, n=i+1;
+  let h=`<div class="part"><div class="plab"><span class="pname">${esc(p.label)}</span>${p.link?link(p.link):""}</div>`;
+  if(r.given){
+    h+=`<div class="given"><span class="gbadge">${ic("🔒")} Donnée fournie</span><b>${vals(r)}</b><small>Source : ${esc(r.src||p.src)}${p.calcTruck?" · durée en camion et prix déjà calculés":""} · compté dans le total</small></div>`;
+  } else {
+    const dur = `<fieldset class="fld"><legend>${p.calcTruck||p.calcCar?"Durée indiquée par Google Maps":"Durée"}</legend><div class="dur">
+        <input type="number" min="0" inputmode="numeric" data-s="${i}" data-p="${x.key}" data-k="h" value="${esc(v.h)}" aria-label="${esc(p.label)} : heures"><span aria-hidden="true">h</span>
+        <input type="number" min="0" max="59" inputmode="numeric" data-s="${i}" data-p="${x.key}" data-k="m" value="${esc(v.m)}" aria-label="${esc(p.label)} : minutes"><span aria-hidden="true">min</span></div></fieldset>`;
+    if(p.calcTruck||p.calcCar){
+      h+=`<div class="fields"><label for="${id}km">Distance (en km)<input type="number" min="0" inputmode="numeric" id="${id}km" data-s="${i}" data-p="${x.key}" data-k="km" value="${esc(v.km)}"></label>${dur}</div>
+        <p class="calc" id="${id}c" aria-live="polite">${calcText(p,r)}</p>`;
+    } else {
+      h+=`<div class="fields">${dur}${p.fixP!=null
+        ? `<div class="fld"><span>Prix</span><span class="given" style="margin:0"><span class="gbadge">${ic("🔒")} Donnée fournie</span><b>${eur(p.fixP)}</b></span></div>`
+        : `<label for="${id}p">Prix (en €)<input type="number" id="${id}p" min="0" step="0.5" inputmode="decimal" data-s="${i}" data-p="${x.key}" data-k="p" value="${esc(v.p)}"></label>`}</div>`;
+    }
+  }
+  return h+`</div>`;
+}
 function stepHTML(M,s,i,st){
-  const v = st.steps[i]||{}, V=sview(s), n=i+1;
-  const openHint = lvl()>=3 ? "open" : "";
+  const sv=st.steps[i]||{}, parts=sv.parts||{}, n=i+1;
+  const byChoice = c => c.parts.map((p,j)=>partHTML(M,i,{p,key:c.id+"-"+j,cid:c.id}, parts[c.id+"-"+j])).join("");
   return `<li class="step" id="step${i}">
     <h3><span class="num" aria-hidden="true">${n}</span><span class="sr">Étape ${n} :</span> ${esc(M.stops[i])} <span aria-hidden="true">→</span><span class="sr"> vers </span> ${esc(M.stops[i+1])} <span class="md">${ic(s.mode)} ${esc(s.md)}</span></h3>
     <p class="task">${esc(s.task)}${say(s.task,"la consigne de l’étape "+n)}</p>
-    <div class="links">${s.links.map(link).join("")}</div>
-    ${V.fixed.map(f=>`<div class="given"><span class="gbadge">${ic("🔒")} Donnée fournie</span><span class="glab">${esc(f.label)}</span>${f.info?"":`<b>${[f.m?fmt(f.m):"",f.p?eur(f.p):""].filter(Boolean).join(" · ")}</b>`}<small>Source : ${esc(f.src)}${f.info?"":" · déjà compté dans le total"}</small></div>`).join("")}
-    <div class="fields">
-      ${V.given?"":`<fieldset class="fld"><legend>Durée</legend><div class="dur">
-        <input type="number" min="0" inputmode="numeric" id="h${i}" data-s="${i}" data-k="h" value="${esc(v.h)}" aria-label="Étape ${n}, durée en heures"><span aria-hidden="true">h</span>
-        <input type="number" min="0" max="59" inputmode="numeric" data-s="${i}" data-k="m" value="${esc(v.m)}" aria-label="Étape ${n}, minutes"><span aria-hidden="true">min</span></div></fieldset>
-      <label for="p${i}">Prix (en €)<input type="number" id="p${i}" min="0" step="0.5" inputmode="decimal" data-s="${i}" data-k="p" value="${esc(v.p)}"></label>`}
-      <label class="wide" for="n${i}">Transport utilisé, distance, remarques<input type="text" id="n${i}" data-s="${i}" data-k="n" value="${esc(v.n)}"></label>
-    </div>
-    <details class="hint" ${openHint}><summary>Coup de pouce</summary><p>${esc(s.hint)}${say(s.hint,"le coup de pouce")}</p></details>
+    ${s.choices
+      ? `<fieldset class="choices"><legend>Quelle solution choisissez-vous ?</legend>${s.choices.map(c=>`<div class="choice-box ${sv.choice===c.id?"on":""}" data-box="${i}-${c.id}">
+          <label class="opt"><input type="radio" name="ch${i}" value="${c.id}" data-choice="${i}" ${sv.choice===c.id?"checked":""}><b>${esc(c.label)}</b></label>${byChoice(c)}</div>`).join("")}</fieldset>`
+      : (s.parts||[]).map((p,j)=>partHTML(M,i,{p,key:String(j)}, parts[String(j)])).join("")}
+    ${(s.infos||[]).map(f=>`<div class="given"><span class="gbadge">${ic("🔒")} Donnée fournie</span><span class="glab">${esc(f.label)}</span><small>Source : ${esc(f.src)}</small></div>`).join("")}
+    <p class="subtot" id="sub${i}" aria-live="polite">${subText(M,i)}</p>
+    <div class="fields"><label class="wide" for="n${i}">Remarques (changements, transports utilisés…)<input type="text" id="n${i}" data-s="${i}" data-k="n" value="${esc(sv.n)}"></label></div>
+    <details class="hint" ${lvl()>=3?"open":""}><summary>Coup de pouce</summary><p>${esc(s.hint)}${say(s.hint,"le coup de pouce")}</p></details>
   </li>`;
 }
-
 const MINC = 15;
 function corrHTML(id, c, val){
   if(!c) return "";
@@ -746,7 +834,15 @@ function renderMission(M){
 
   document.getElementById("chg").onclick=()=>{ S.pickM=M.id; go("home"); };
   view.querySelectorAll("input[data-s]").forEach(inp=>inp.oninput=()=>{
-    const i=inp.dataset.s; st.steps[i]=st.steps[i]||{}; st.steps[i][inp.dataset.k]=inp.value; save(); refresh(M);
+    const i=inp.dataset.s; st.steps[i]=st.steps[i]||{};
+    if(inp.dataset.p!==undefined){ const P=st.steps[i].parts=st.steps[i].parts||{}; P[inp.dataset.p]=P[inp.dataset.p]||{}; P[inp.dataset.p][inp.dataset.k]=inp.value; }
+    else st.steps[i][inp.dataset.k]=inp.value;
+    save(); refresh(M);
+  });
+  view.querySelectorAll("input[data-choice]").forEach(r=>r.onchange=()=>{
+    const i=r.dataset.choice; st.steps[i]=st.steps[i]||{}; st.steps[i].choice=r.value; save();
+    view.querySelectorAll(`[data-box^="${i}-"]`).forEach(b=>b.classList.toggle("on", b.dataset.box===`${i}-${r.value}`));
+    refresh(M);
   });
   view.querySelectorAll("textarea[data-q]").forEach(t=>t.addEventListener("input",()=>{ st.q[t.dataset.q]=t.value; save(); updCorr(view,t); }));
   view.querySelectorAll(".word").forEach(b=>b.onclick=()=>{
@@ -778,14 +874,19 @@ function refresh(M){
   document.getElementById("tp").textContent=T.p? eur(T.p):"—";
   document.getElementById("route").innerHTML=routeHTML(M);
   document.getElementById("prog").textContent=progressText(M,T);
+  M.steps.forEach((s,i)=>{
+    const e=document.getElementById("sub"+i); if(e) e.textContent=subText(M,i);
+    const sv=ms(M.id).steps[i]||{};
+    stepParts(s).forEach(x=>{ const c=document.getElementById(`s${i}_${x.key}c`); if(c) c.textContent=calcText(x.p, partVal(x.p,(sv.parts||{})[x.key])); });
+  });
 }
 
 function copyFiche(M){
   const st=ms(M.id), T=totals(M);
   let t=`${M.title} (${M.role}) – ${LV().name}\nDate de référence : ${document.getElementById("refdate").textContent}\n\n`;
-  M.steps.forEach((s,i)=>{ const v=st.steps[i]||{}, V=sview(s), d=(+v.h||0)*60+(+v.m||0);
-    t+=`${i+1}. ${M.stops[i]} → ${M.stops[i+1]} (${s.md}) : ${V.given?"":fmt(d)}${!V.given&&v.p?" · "+v.p+" €":""}${v.n?" · "+v.n:""}\n`;
-    V.fixed.filter(f=>!f.info).forEach(f=>{ t+=`   + donnée fournie, ${f.label} : ${[f.m?fmt(f.m):"",f.p?f.p+" €":""].filter(Boolean).join(" · ")}\n`; }); });
+  M.steps.forEach((s,i)=>{ const v=stepVal(M,i);
+    t+=`${i+1}. ${M.stops[i]} → ${M.stops[i+1]} (${s.md}) – sous-total : ${v.m?fmt(v.m):"—"} · ${v.p?eur(v.p):"—"}\n`;
+    stepDesc(M,i).forEach(l=>{ t+=`   – ${l}\n`; }); });
   t+=`\nDurée totale : ${fmt(T.t)}\nPrix total : ${T.p? T.p+" €":"—"}\n\n`;
   M.questions.forEach((q,i)=>{ t+=`${q.q}\n→ ${st.q[i]||"…"}\n\n`; });
   if(st.q.b) t+=`Défi : ${M.bonus}\n→ ${st.q.b}\n`;
@@ -973,10 +1074,9 @@ function recapBlocks(M){
   B.push({t:"h", x:`${M.title} (${M.role})`});
   B.push({t:"p", x:`Date de référence des recherches : ${document.getElementById("refdate").textContent}`});
   B.push({t:"h", x:"Notre trajet"});
-  M.steps.forEach((s,i)=>{ const v=st.steps[i]||{}, V=sview(s), d=(+v.h||0)*60+(+v.m||0);
-    const val = V.given ? "données fournies" : [fmt(d), v.p? v.p+" €":""].filter(Boolean).join(" · ");
-    B.push({t:"q", l:`Étape ${i+1} : ${M.stops[i]} → ${M.stops[i+1]} (${s.md})`, x:val+(v.n?" · "+v.n:"")});
-    V.fixed.filter(f=>!f.info).forEach(f=>B.push({t:"p", x:`   + donnée fournie, ${f.label} : ${[f.m?fmt(f.m):"",f.p?eur(f.p):""].filter(Boolean).join(" · ")}`}));
+  M.steps.forEach((s,i)=>{ const v=stepVal(M,i);
+    B.push({t:"q", l:`Étape ${i+1} : ${M.stops[i]} → ${M.stops[i+1]} (${s.md})`, x:`sous-total ${v.m?fmt(v.m):"—"} · ${v.p?eur(v.p):"—"}`});
+    stepDesc(M,i).forEach(l=>B.push({t:"p", x:"   – "+l}));
   });
   B.push({t:"q", l:"Durée totale", x:fmt(T.t)});
   B.push({t:"q", l:"Prix total (aller simple)", x:T.p? eur(T.p):"—"});
@@ -1032,7 +1132,7 @@ function makeDocx(M){
 /* ---------- correction téléchargeable ---------- */
 function completion(M){
   const st=ms(M.id), miss=[];
-  M.steps.forEach((s,i)=>{ const V=sview(s), v=st.steps[i]||{}; if(!V.given && !((+v.h||0)*60+(+v.m||0))) miss.push(`la durée de l’étape ${i+1} (${M.stops[i]} → ${M.stops[i+1]})`); });
+  M.steps.forEach((s,i)=>{ const v=stepVal(M,i); if(v.needChoice) miss.push(`le choix d’une solution à l’étape ${i+1}`); else if(!v.done) miss.push(`les données de l’étape ${i+1} (${M.stops[i]} → ${M.stops[i+1]})`); });
   M.questions.forEach((q,i)=>{ if((st.q[i]||"").trim().length<MINC) miss.push(`votre réponse à la question ${i+1}`); });
   return miss;
 }
@@ -1046,9 +1146,8 @@ function buildCorrection(W){
     const st=ms(W.id), T=totals(W);
     b += `<section><h2>Votre travail comparé à la correction</h2><h3>${esc(W.title)}</h3>
     <table><caption>Le trajet</caption><thead><tr><th scope="col">Étape</th><th scope="col">Votre réponse</th><th scope="col">Correction</th></tr></thead><tbody>`;
-    W.steps.forEach((s,i)=>{ const v=st.steps[i]||{}, V=sview(s), d=(+v.h||0)*60+(+v.m||0);
-      const mine = V.given ? `Donnée fournie : ${V.fixed.filter(f=>!f.info).map(f=>esc(f.label)+" ("+[f.m?fmt(f.m):"",f.p?eur(f.p):""].filter(Boolean).join(", ")+")").join(" ; ")}`
-        : `${fmt(d)}${v.p?" · "+esc(v.p)+" €":""}${v.n?" · "+esc(v.n):""}`;
+    W.steps.forEach((s,i)=>{ const v=stepVal(W,i);
+      const mine = stepDesc(W,i).map(esc).join("<br>")+`<br><b>Sous-total : ${v.m?fmt(v.m):"—"} · ${v.p?eur(v.p):"—"}</b>`;
       b += `<tr><th scope="row">${i+1}. ${esc(W.stops[i])} → ${esc(W.stops[i+1])}</th><td>${mine}</td><td>${esc(W.corrSteps[i])}</td></tr>`; });
     b += `<tr><th scope="row">Total</th><td>${fmt(T.t)} · ${T.p?eur(T.p):"—"}</td><td>${esc(W.corrSteps[W.corrSteps.length-1])}</td></tr></tbody></table>`;
     W.questions.forEach((q,i)=>{ b += `<div class="qa"><h4>${esc(q.q)}</h4><p><b>Votre réponse :</b> ${esc(st.q[i]||"(pas de réponse)")}</p><p class="c"><b>Correction :</b> ${esc(q.c)}</p></div>`; });
@@ -1057,9 +1156,9 @@ function buildCorrection(W){
   }
   const rows = MISSIONS.map(M=>({M, R:bilanRow(M)}));
   b += `<section><h2>La mise en commun de la classe</h2>
-  <table><caption>Résultats présentés par les groupes</caption><thead><tr><th scope="col">Mission</th><th scope="col">Transports</th><th scope="col">Durée</th><th scope="col">Prix</th><th scope="col">Un atout de Londres montré</th></tr></thead><tbody>
+  <table><caption>Résultats présentés par les groupes</caption><thead><tr><th scope="col">Mission</th><th scope="col">Transports</th><th scope="col">Durée</th><th scope="col">Prix</th><th scope="col">Ce que notre trajet montre de Londres</th><th scope="col">Réponse attendue</th></tr></thead><tbody>
   ${rows.map(({M,R})=>{ const h=parseFloat(String(R.h).replace(",",".")), pr=parseFloat(String(R.p).replace(",","."));
-    return `<tr><th scope="row">${esc(R.nm)}</th><td>${esc(R.modes)||"—"}</td><td>${h?fmt(Math.round(h*60)):"—"}</td><td>${pr?eur(pr)+(M.ref?" ("+M.ref.unit+")":""):"—"}</td><td>${esc(R.a)||"—"}</td></tr>`; }).join("")}
+    return `<tr><th scope="row">${esc(R.nm)}</th><td>${esc(R.modes)||"—"}</td><td>${h?fmt(Math.round(h*60)):"—"}</td><td>${pr?eur(pr)+(M.ref?" ("+M.ref.unit+")":""):"—"}</td><td>${esc(R.a)||"—"}</td><td>${esc(M.atout)}</td></tr>`; }).join("")}
   </tbody></table>
   <h3>Notre conclusion de classe</h3><p class="trace">${S.concl&&S.concl.trim()? esc(S.concl).replace(/\n/g,"<br>") : "(conclusion non rédigée)"}</p></section>`;
   b += `<section><h2>Correction de toutes les missions</h2>`;
@@ -1103,7 +1202,7 @@ window.buildCorrection = buildCorrection;
 function hasWork(M){
   if(!M || M.guided) return false;
   const st=ms(M.id);
-  return Object.values(st.steps).some(v=>v&&(v.h||v.m||v.p||v.n)) || Object.values(st.q).some(v=>v&&v.trim());
+  return Object.values(st.steps).some(v=>v&&(v.n||v.choice||Object.values(v.parts||{}).some(x=>x&&(x.h||x.m||x.p||x.km)))) || Object.values(st.q).some(v=>v&&v.trim());
 }
 function bilanRow(M){
   const b=S.bilan[M.id]||{}, T=totals(M), w=hasWork(M);
@@ -1118,14 +1217,14 @@ function renderBilan(){
   setColor(null);
   let h=`<div class="mission-head"><div class="mh-top"><div class="badges"><span class="role" style="background:var(--ink);color:var(--paper)">${ic("📊")} Toute la classe</span></div><h2>Mise en commun</h2>
   <p>Chaque groupe présente son trajet. Complétez le tableau : les durées et les prix se comparent automatiquement. Les lignes camion et navire sont pré-remplies avec des ordres de grandeur, à corriger avec les résultats des élèves.</p></div><div style="height:16px"></div></div>
-  <div class="tablewrap"><table><caption class="sr">Résultats des missions</caption><thead><tr><th scope="col">Mission</th><th scope="col">Transports</th><th scope="col">Durée (h)</th><th scope="col">Prix (€)</th><th scope="col">Un atout de Londres montré</th></tr></thead><tbody>`;
+  <div class="tablewrap"><table><caption class="sr">Résultats des missions</caption><thead><tr><th scope="col">Mission</th><th scope="col">Transports</th><th scope="col">Durée (h)</th><th scope="col">Prix (€)</th><th scope="col">Ce que notre trajet montre de Londres</th></tr></thead><tbody>`;
   MISSIONS.forEach(M=>{
     const R=bilanRow(M), nm=R.nm;
     h+=`<tr><th scope="row"><span class="mname" style="--c:${M.color};--cl:${M.light}">${ic(M.icon)} ${esc(nm)}</span></th>
     <td><input type="text" data-b="${M.id}" data-k="modes" aria-label="${esc(nm)} : transports" value="${esc(R.modes)}"></td>
     <td><input type="number" min="0" step="0.5" data-b="${M.id}" data-k="h" aria-label="${esc(nm)} : durée en heures" value="${esc(R.h)}"></td>
     <td><input type="number" min="0" data-b="${M.id}" data-k="p" aria-label="${esc(nm)} : prix en euros${M.ref?", "+M.ref.unit:""}" value="${esc(R.p)}">${M.ref?`<small class="unit">${M.ref.unit}</small>`:""}</td>
-    <td><input type="text" data-b="${M.id}" data-k="a" aria-label="${esc(nm)} : atout de Londres" value="${esc(R.a)}"></td></tr>`;
+    <td><input type="text" data-b="${M.id}" data-k="a" aria-label="${esc(nm)} : ce que le trajet montre de Londres" placeholder="Londres est… grâce à…" value="${esc(R.a)}"></td></tr>`;
   });
   h+=`</tbody></table></div>
   <section class="bars" aria-labelledby="b1"><h3 id="b1" class="disp" style="font-size:1.2rem;margin-bottom:6px">Combien de temps pour rejoindre Londres ?</h3><div id="bars"></div></section>
@@ -1134,7 +1233,7 @@ function renderBilan(){
     <div class="q"><label for="concl">Londres est connectée au monde grâce à…</label><textarea id="concl">${esc(S.concl)}</textarea>
     <div class="words" role="group" aria-label="Mots utiles à ajouter">${["aéroports internationaux","tunnel sous la Manche","Eurostar","ports","conteneurs","flux de personnes","flux de marchandises","métropole mondiale","interface"].map(w=>`<button type="button" class="word" data-w="${w}" aria-label="Ajouter « ${w} »">+ ${w}</button>`).join("")}</div></div>
   </section>`;
-  if(teacher) h+=`<div class="teacher"><h3>Repères enseignant</h3><ul><li>Avion ~7 h · Train ~9 h · Bus ~22 h · Camion 1,5 à 2 jours · Navire 5 à 7 jours.</li><li>Prix : ~2 800 € pour un camion de pélardons, ~2 000 € pour un conteneur de 10 000 pièces, soit quelques centimes par objet transporté.</li><li>Idée à faire émerger : plus le trajet est rapide, plus il est cher ; Londres est reliée par tous les modes de transport, pour les personnes comme pour les marchandises.</li></ul></div>`;
+  if(teacher) h+=`<div class="teacher"><h3>Repères enseignant</h3><ul><li>Avion ~7 h · Train ~9 h · Bus ~22 h · Camion 1,5 à 2 jours · Navire 5 à 7 jours.</li><li>Prix : ~2 800 € pour un camion de pélardons, ~2 000 € pour un conteneur de 10 000 pièces, soit quelques centimes par objet transporté.</li><li>« Ce que notre trajet montre de Londres », réponses attendues :<ul>${MISSIONS.map(M=>`<li><b>${esc(M.tab.replace(" (en classe)",""))}</b> : ${esc(M.atout)}</li>`).join("")}</ul></li><li>Idée à faire émerger : plus le trajet est rapide, plus il est cher ; Londres est reliée par tous les modes de transport, pour les personnes comme pour les marchandises.</li></ul></div>`;
   h+=`<div class="actions" style="margin-top:14px"><button class="btn" id="dlAll">${ic("📥")} Télécharger la correction complète</button><button class="btn alt" id="clrB">Remettre le tableau à zéro</button></div>`;
   const view=document.getElementById("view"); view.innerHTML=h;
   view.querySelectorAll("input[data-b]").forEach(inp=>inp.oninput=()=>{ const id=inp.dataset.b; S.bilan[id]=S.bilan[id]||{}; S.bilan[id][inp.dataset.k]=inp.value; save(); drawBars(); });
