@@ -352,19 +352,18 @@ const MISSIONS = [
        {label:"Vol Montpellier → Londres-Gatwick", link:L.flights}],
      hint:"Il n’y a pas de vol direct vers Heathrow : cherchez Gatwick (LGW). Attention, il est 1 h de moins à Londres : ne calculez pas la durée avec les heures affichées, lisez la durée du vol."},
     {mode:"🚇", md:"train et métro",
-     task:"De Gatwick, trouvez comment rejoindre le British Museum en transports en commun. Google Maps donne tout le trajet d’un coup (train puis métro).",
+     task:"De Gatwick, trouvez comment rejoindre le British Museum en transports en commun. Google Maps donne tout le trajet d’un coup (train puis métro) : notez la durée. Google Maps n’affiche pas le prix des trains anglais : il vous est fourni.",
      parts:[
-       {label:"Gatwick → British Museum en train et métro", link:{label:"Google Maps · transports en commun",url:g("Gatwick Airport","British Museum, London","transit")}, lv:{3:{m:70,p:20}}}],
-     infos:[{label:"1 £ ≈ 1,15 € : multipliez les prix en livres par 1,15", src:"taux de change arrondi"}],
-     hint:"Le prix est en livres sterling (£) : utilisez le taux fourni et arrondissez."}
+       {label:"Gatwick → British Museum en train et métro", link:{label:"Google Maps · transports en commun",url:g("Gatwick Airport","British Museum, London","transit")}, fixP:16, src:"tarif sans contact hors heures de pointe : train 10,70 £ + métro 2,90 £ = 13,60 £, soit environ 16 €", lv:{3:{m:70,p:16}}}],
+     hint:"Regardez la durée totale en haut de l’itinéraire. Aux heures de pointe (6 h 30 – 9 h 30 en semaine), le train coûte presque deux fois plus cher."}
   ],
-  corrSteps:["La Grand-Combe → aéroport de Montpellier : environ 2 h 30 en transports en commun (TER jusqu’à Nîmes puis Montpellier, puis navette), pour environ 20 €. En voiture : environ 1 h 15.", "Vol direct Montpellier → Londres-Gatwick : environ 1 h 55, de 50 à 150 € selon la date, plus 1 h 30 d’attente à l’aéroport. Il n’y a pas de vol direct vers Heathrow.", "Gatwick → British Museum : train (Thameslink ou Gatwick Express) puis métro, environ 1 h à 1 h 15, pour environ 20 €.", "Total : environ 6 h 30 à 7 h 30, pour 110 à 200 € l’aller simple."],
+  corrSteps:["La Grand-Combe → aéroport de Montpellier : environ 2 h 30 en transports en commun (TER jusqu’à Nîmes puis Montpellier, puis navette), pour environ 20 €. En voiture : environ 1 h 15.", "Vol direct Montpellier → Londres-Gatwick : environ 1 h 55, de 50 à 150 € selon la date, plus 1 h 30 d’attente à l’aéroport. Il n’y a pas de vol direct vers Heathrow.", "Gatwick → British Museum : train (Thameslink ou Southern) puis métro, environ 1 h à 1 h 15, pour environ 16 € hors heures de pointe (13,60 £).", "Total : environ 6 h 30 à 7 h 30, pour 110 à 200 € l’aller simple."],
   questions:[
     {st:"L’aller-retour coûte environ … € car …", q:"Estimez le prix d’un aller-retour pour une personne (même trajet).", hint:"Doublez votre prix total.", c:"Un aller simple coûte environ 110 à 200 € : ~20 € pour rejoindre l’aéroport, 50 à 150 € pour le vol, ~20 € de train et métro à Londres. L’aller-retour revient donc à environ 220 à 400 €. C’est surtout le prix du vol qui varie, selon la date et le moment où l’on réserve."},
     {st:"Londres est facile d’accès pour les touristes car elle possède …", q:"Montrez que Londres est facilement accessible aux touristes du monde entier.", c:"Londres possède 5 aéroports internationaux (Heathrow, Gatwick, Stansted, Luton, City) qui reçoivent des vols du monde entier. Même depuis une petite ville du Gard, on y arrive en moins de 8 h grâce à un vol direct de 2 h. Des trains rapides et le métro relient les aéroports au centre. Londres est une métropole mondiale, un hub qui accueille d’importants flux de touristes.", words:["5 aéroports","aéroport international","hub","métropole mondiale","flux de touristes"]}
   ],
   bonus:"Combien d’aéroports compte Londres ? Cherchez lequel est le plus fréquenté.", bonusC:"Londres compte 5 aéroports internationaux. Heathrow est le plus fréquenté : plus de 80 millions de passagers par an, l’un des plus grands aéroports du monde.",
-  teacher:["La Grand-Combe → aéroport : ~1 h 15 en voiture ; 2 h 30 à 3 h en transports (TER via Nîmes + navette).","Vol easyJet Montpellier → Gatwick direct, ~1 h 55, prix de ~50 à 150 € selon la date. Pas de direct vers Heathrow.","Gatwick → British Museum : Thameslink ou Gatwick Express + métro, ~1 h à 1 h 15, ~15 à 25 £.","Total réaliste avec l’attente aéroport : 6 h 30 à 7 h 30."]
+  teacher:["La Grand-Combe → aéroport : ~1 h 15 en voiture ; 2 h 30 à 3 h en transports (TER via Nîmes + navette).","Vol easyJet Montpellier → Gatwick direct, ~1 h 55, prix de ~50 à 150 € selon la date. Pas de direct vers Heathrow.","Gatwick → British Museum : Thameslink ou Southern + métro, ~1 h à 1 h 15. Google Maps n’affiche pas le prix des trains anglais : prix fourni, 13,60 £ ≈ 16 € hors pointe (10,70 £ de train sans contact + 2,90 £ de métro), ~22 £ aux heures de pointe. Gatwick Express : 24 £ le train seul.","Total réaliste avec l’attente aéroport : 6 h 30 à 7 h 30."]
 },
 { id:"train", atout:"Grâce à l’Eurostar et au tunnel sous la Manche, Londres est à un peu plus de 2 h de Paris, de centre-ville à centre-ville : elle est intégrée au réseau européen de grande vitesse, ce qui compte pour les affaires (Canary Wharf).", color:"#1B7F55", light:"#6FD3A5", icon:"🚄", tab:"Cadres · train",
   role:"Vous êtes des cadres d’entreprise", title:"Rejoindre Canary Wharf",
@@ -721,7 +720,7 @@ function partHTML(M,i,x,v){
         <p class="calc" id="${id}c" aria-live="polite">${calcText(p,r)}</p>`;
     } else {
       h+=`<div class="fields">${dur}${p.fixP!=null
-        ? `<div class="fld"><span>Prix</span><span class="given" style="margin:0"><span class="gbadge">${ic("🔒")} Donnée fournie</span><b>${eur(p.fixP)}</b></span></div>`
+        ? `<div class="fld"><span>Prix</span><span class="given" style="margin:0"><span class="gbadge">${ic("🔒")} Donnée fournie</span><b>${eur(p.fixP)}</b></span>${p.src?`<small class="cnote">Source : ${esc(p.src)}</small>`:""}</div>`
         : `<label for="${id}p">Prix (en €)<input type="number" id="${id}p" min="0" step="0.5" inputmode="decimal" data-s="${i}" data-p="${x.key}" data-k="p" value="${esc(v.p)}"></label>`}</div>`;
     }
   }
